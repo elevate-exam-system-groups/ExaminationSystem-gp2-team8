@@ -16,11 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Infrastructure\Persistance\Persistance.csproj" />
-    <ProjectReference Include="..\Infrastructure\presentation\presentation.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Domain\" />
   </ItemGroup>
 
