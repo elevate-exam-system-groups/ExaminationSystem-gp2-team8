@@ -1,5 +1,6 @@
 
 using ExaminationSystem.Infrastructure.Persistence;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem
@@ -23,6 +24,9 @@ namespace ExaminationSystem
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
+
+            
+            builder.Services.AddMediatR(typeof(Program).Assembly);
 
 
             var app = builder.Build();

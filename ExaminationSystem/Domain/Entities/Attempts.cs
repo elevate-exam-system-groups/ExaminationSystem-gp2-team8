@@ -10,7 +10,7 @@ namespace ExaminationSystem.Domain.Entities
 
         public int UserId { get; set; }
         public User User { get; set; } = null!;
-        public float score { get; set; }
+        public double score { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime Deadline { get; set; }
 
