@@ -18,5 +18,7 @@ namespace ExaminationSystem.Domain.Entities
 
         public User CreatedByUser { get; set; } = null!;
         public int CreatedByUserId { get; set; }//FK
+
+        public ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();
     }
 }
