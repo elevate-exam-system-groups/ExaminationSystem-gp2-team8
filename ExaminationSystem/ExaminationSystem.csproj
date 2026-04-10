@@ -24,7 +24,6 @@
     <Folder Include="API\Middlewares\" />
     <Folder Include="BuildingBlocks\Behaviors\" />
     <Folder Include="BuildingBlocks\Exceptions\" />
-    <Folder Include="BuildingBlocks\Interfaces\" />
     <Folder Include="Domain\Events\" />
     <Folder Include="Domain\ValueObjects\" />
     <Folder Include="Infrastructure\Identity\" />
