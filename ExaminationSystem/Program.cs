@@ -1,4 +1,6 @@
 
+using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Infrastructure.Identity;
 using ExaminationSystem.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +25,8 @@ namespace ExaminationSystem
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
+            builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
+            builder.Services.AddHttpContextAccessor();
 
 
             var app = builder.Build();
