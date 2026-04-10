@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\DomainLayer\DomainLayer.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Data\Configrations\" />
     <Folder Include="Data\Migrations\" />
   </ItemGroup>

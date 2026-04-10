@@ -10,8 +10,4 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Core\Services\Services.csproj" />
-  </ItemGroup>
-
 </Project>
