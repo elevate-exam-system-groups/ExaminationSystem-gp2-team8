@@ -10,6 +10,7 @@ namespace ExaminationSystem.Domain.Entities
 
         public string Description { get; set; } = null!;
 
+        public int QuizCount { get; set; }
         public Status status { get; set; }
 
         public bool IsDeleted { get; set; }//Soft Delete
@@ -18,7 +19,6 @@ namespace ExaminationSystem.Domain.Entities
 
         public User CreatedByUser { get; set; } = null!;
         public int CreatedByUserId { get; set; }//FK
-
         public ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();
     }
 }
