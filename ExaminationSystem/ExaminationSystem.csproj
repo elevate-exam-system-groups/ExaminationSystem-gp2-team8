@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="API\Controllers\" />
     <Folder Include="API\Middlewares\" />
     <Folder Include="API\Filters\" />
     <Folder Include="API\Extensions\" />

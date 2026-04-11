@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Features.Diplomas.Queries
 {
-    public record GetAllDiplomasQuery(int Page = 1, int PerPage = 10) : IRequest<PaginatedResult<DiplomaDTO>>;
+    public record GetAllDiplomasQuery(int Page , int PerPage ) : IRequest<PaginatedResult<DiplomaDTO>>;
 
     public class GetAllDiplomasQueryHandler : IRequestHandler<GetAllDiplomasQuery, PaginatedResult<DiplomaDTO>>
     {
