@@ -26,5 +26,9 @@ namespace ExaminationSystem.Domain.Entities
 
         public int DiplomaId { get; set; }
         public Diploma Diploma { get; set; } = null!;
+
+        public ICollection<Attempts> Attempts { get; set; } = new List<Attempts>();
+
+
     }
 }

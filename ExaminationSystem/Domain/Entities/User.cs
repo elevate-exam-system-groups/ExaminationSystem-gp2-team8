@@ -14,5 +14,6 @@ namespace ExaminationSystem.Domain.Entities
         public string? RefreshToken { get; set; }
 
         public UserStatus Status { get; set; }
+
     }
 }

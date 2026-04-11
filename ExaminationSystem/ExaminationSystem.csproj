@@ -26,7 +26,6 @@
     <Folder Include="BuildingBlocks\Exceptions\" />
     <Folder Include="Domain\Events\" />
     <Folder Include="Domain\ValueObjects\" />
-    <Folder Include="Infrastructure\Identity\" />
     <Folder Include="Infrastructure\Services\" />
     <Folder Include="Tests\" />
   </ItemGroup>

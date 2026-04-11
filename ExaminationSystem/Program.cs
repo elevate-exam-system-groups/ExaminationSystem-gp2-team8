@@ -1,4 +1,7 @@
 
+using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Features.Diplomas.Queries;
+using ExaminationSystem.Infrastructure.Identity;
 using ExaminationSystem.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

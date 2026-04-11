@@ -9,7 +9,7 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
         public void Configure(EntityTypeBuilder<Quiz> builder)
         {
             builder.HasOne(q => q.CreatedByUser).WithMany().HasForeignKey(q => q.CreatedByUserId).OnDelete(DeleteBehavior.Restrict); 
-            builder.HasOne(q => q.Diploma).WithMany().HasForeignKey(q => q.DiplomaId).OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(q => q.Diploma).WithMany(d=>d.Quizzes).HasForeignKey(q => q.DiplomaId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
