@@ -1,4 +1,6 @@
-﻿using ExaminationSystem.Features.Diplomas.Queries;
+﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.Features.Diplomas.DTOS;
+using ExaminationSystem.Features.Diplomas.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +25,22 @@ namespace ExaminationSystem.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{diplomaId}/quizzes")]
+        public async Task<IActionResult> GetDiplomaById(int diplomaId, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetPublishDiplomaByIdQuery(diplomaId), cancellationToken);
+
+            if (!result.isSuccess)
+            {
+                return result.Error?.Code switch
+                {
+                    "NOT_FOUND" => NotFound(result),
+                    "FORBIDDEN" => StatusCode(403, result),
+                    _ => BadRequest(result)
+                };
+            }
+            return Ok(result);
+        }
 
     }
 }
