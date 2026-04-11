@@ -1,4 +1,5 @@
 ﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.Exceptions;
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
@@ -27,25 +28,25 @@ namespace ExaminationSystem.Features.Diplomas.Queries
         }
         public async Task<ApiResponse<DiplomasummaryDTO?>> Handle(GetPublishDiplomaByIdQuery request, CancellationToken cancellationToken)
         {
-
-
+           
             //wait till student Auth
             var enrolled = await _mediator.Send(new GetStudentDiplomaEnrollment(_currentUser.UserId));
             if (!enrolled.Contains(request.id))
             {
-                return ApiResponse<DiplomasummaryDTO?>.FailureResponse("Student not enrolled in diploma", "FORRBIDN");
+                throw new ForbiddenException("Student not enrolled");
             }
 
             var diploma = _repository.GetAll()
-             .Include(d => d.Quizzes)
-             .ThenInclude(q => q.Attempts)
-             .Where(d => d.Id == request.id && d.status==Status.pulished)
-             .FirstOrDefault();
+            .Include(d => d.Quizzes)
+            .ThenInclude(q => q.Attempts)
+            .Where(d => d.Id == request.id && d.status == Status.pulished)
+            .FirstOrDefault();
+
             if (diploma == null)
             {
-                return ApiResponse<DiplomasummaryDTO?>.FailureResponse("diploma is not found or puplished", "NOT_FOUND");
-
+                throw new NotFoundException("Diploma is not found");
             }
+
 
 
 

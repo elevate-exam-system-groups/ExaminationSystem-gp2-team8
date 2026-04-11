@@ -1,4 +1,5 @@
 
+using ExaminationSystem.API.Middlewares;
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Features.Diplomas.Queries;
 using ExaminationSystem.Infrastructure.Identity;
@@ -39,13 +40,14 @@ namespace ExaminationSystem
 
             var app = builder.Build();
 
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseMiddleware<CustomMiddleWareHandler>();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

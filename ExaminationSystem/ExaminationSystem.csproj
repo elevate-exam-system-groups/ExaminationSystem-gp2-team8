@@ -21,9 +21,7 @@
   <ItemGroup>
     <Folder Include="API\Filters\" />
     <Folder Include="API\Extensions\" />
-    <Folder Include="API\Middlewares\" />
     <Folder Include="BuildingBlocks\Behaviors\" />
-    <Folder Include="BuildingBlocks\Exceptions\" />
     <Folder Include="Domain\Events\" />
     <Folder Include="Domain\ValueObjects\" />
     <Folder Include="Infrastructure\Services\" />
