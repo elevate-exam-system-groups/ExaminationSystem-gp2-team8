@@ -12,6 +12,7 @@ namespace ExaminationSystem.Infrastructure.Identity
         }
 
 
+
         public int UserId=>_httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == "id")?.Value != null
             ? int.Parse(_httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "id")!.Value)
             : 0;
