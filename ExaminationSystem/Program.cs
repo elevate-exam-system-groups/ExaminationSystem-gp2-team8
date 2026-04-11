@@ -3,8 +3,10 @@ using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Features.Diplomas.Queries;
 using ExaminationSystem.Infrastructure.Identity;
 using ExaminationSystem.Infrastructure.Persistence;
+using ExaminationSystem.Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace ExaminationSystem
 {
@@ -30,6 +32,9 @@ namespace ExaminationSystem
 
             
             builder.Services.AddMediatR(typeof(Program).Assembly);
+            builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddScoped(typeof(IGeneralRepository<>), typeof(GeneralRepository<>));
 
 
             var app = builder.Build();
