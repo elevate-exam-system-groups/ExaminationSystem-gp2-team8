@@ -3,7 +3,6 @@ using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Features.Diplomas.Queries;
 using ExaminationSystem.Infrastructure.Identity;
 using ExaminationSystem.Infrastructure.Persistence;
-using ExaminationSystem.Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,10 +27,10 @@ namespace ExaminationSystem
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
-            builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
-            builder.Services.AddHttpContextAccessor();
-            builder.Services.AddScoped(typeof(IGeneralRepository<>), typeof(GeneralRepository<>));
-            builder.Services.AddMediatR(typeof(GetAllDiplomasQuery).Assembly);
+
+            
+            builder.Services.AddMediatR(typeof(Program).Assembly);
+
 
             var app = builder.Build();
 

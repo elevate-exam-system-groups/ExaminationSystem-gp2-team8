@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="MediatR" Version="10.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.25" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.25" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.25">
@@ -19,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="API\Middlewares\" />
     <Folder Include="API\Filters\" />
     <Folder Include="API\Extensions\" />
+    <Folder Include="API\Middlewares\" />
     <Folder Include="BuildingBlocks\Behaviors\" />
     <Folder Include="BuildingBlocks\Exceptions\" />
     <Folder Include="Domain\Events\" />
