@@ -9,17 +9,18 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
         public void Configure(EntityTypeBuilder<Enrollment> builder)
         {
             builder.HasKey(e => e.Id);
+            builder.HasQueryFilter(e => !e.Diploma.IsDeleted);
 
             // Relationships
             builder.HasOne(e => e.User)
-                   .WithMany()
+                   .WithMany(u => u.Enrollments)
                    .HasForeignKey(e => e.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.Diploma)
-                   .WithMany()
+                   .WithMany(d => d.Enrollments)
                    .HasForeignKey(e => e.DiplomaId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             // Prevent duplicate enrollment 🚨
             builder.HasIndex(e => new { e.UserId, e.DiplomaId })

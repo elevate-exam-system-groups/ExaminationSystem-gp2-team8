@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.Domain.Enums;
+using ExaminationSystem.Domain.Enums;
 
 namespace ExaminationSystem.Domain.Entities
 {
@@ -16,10 +16,8 @@ namespace ExaminationSystem.Domain.Entities
         public Status Status { get; set; }
 
         public string? Instructions { get; set; }
-
-        // Soft delete
-        public bool IsDeleted { get; set; }
-
+        public DateTime? DeletedAt { get; set; }
+        public bool IsDeleted { get; set; }//Soft Delete
         //  FK
         public int CreatedByUserId { get; set; }
         public User CreatedByUser { get; set; } = null!;
@@ -27,8 +25,7 @@ namespace ExaminationSystem.Domain.Entities
         public int DiplomaId { get; set; }
         public Diploma Diploma { get; set; } = null!;
 
+        public ICollection<Question> Questions { get; set; } = new List<Question>();
         public ICollection<Attempts> Attempts { get; set; } = new List<Attempts>();
-
-
     }
 }

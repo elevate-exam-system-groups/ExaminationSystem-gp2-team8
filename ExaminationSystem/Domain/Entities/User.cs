@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.Domain.Enums;
+using ExaminationSystem.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace ExaminationSystem.Domain.Entities
@@ -14,6 +14,12 @@ namespace ExaminationSystem.Domain.Entities
         public string? RefreshToken { get; set; }
 
         public UserStatus Status { get; set; }
+        public ICollection<Diploma> CreatedDiplomas { get; set; } = new List<Diploma>();
+        public ICollection<Quiz> CreatedQuizzes { get; set; } = new List<Quiz>();
+        public ICollection<Question> CreatedQuestions { get; set; } = new List<Question>();
+        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+        public ICollection<Attempts> Attempts { get; set; } = new List<Attempts>();
+        public ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();
 
     }
 }

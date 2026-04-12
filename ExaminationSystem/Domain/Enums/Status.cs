@@ -2,7 +2,7 @@
 {
     public enum Status
     {
-        pulished=1,
+        published=1,
         Draft
     }
 }
