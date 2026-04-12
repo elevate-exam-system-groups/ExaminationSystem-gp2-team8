@@ -26,7 +26,7 @@ namespace ExaminationSystem.Features.Attempts.GetAttempts
             if (request.diplomaId.HasValue)
                 query = query.Where(a=> a.Quiz.DiplomaId == request.diplomaId);
 
-            query = query.OrderByDescending(a => a.StartTime);
+            query = query.OrderByDescending(a => a.SubmittedAt);
 
             var count = await query.CountAsync();
 
@@ -38,7 +38,7 @@ namespace ExaminationSystem.Features.Attempts.GetAttempts
                     a.score,
                     a.Attempt.ToString(),
                     a.score >= a.Quiz.PassScore,
-                    a.StartTime
+                    a.SubmittedAt
                     )).ToListAsync();
 
             return new PaginatedResult<QuizHistoryDto>(items, count, request.page, request.perPage);
