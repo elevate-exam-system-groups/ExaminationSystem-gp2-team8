@@ -1,7 +1,6 @@
 ﻿using ExaminationSystem.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Infrastructure.Persistence
@@ -18,6 +17,54 @@ namespace ExaminationSystem.Infrastructure.Persistence
         {
             base.OnModelCreating(builder);
             builder.ApplyConfigurationsFromAssembly(typeof(ExamAppDbContext).Assembly);
+        }
+
+        public override int SaveChanges()
+        {
+            ApplySoftDeleteRules();
+            return base.SaveChanges();
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            ApplySoftDeleteRules();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            ApplySoftDeleteRules();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            ApplySoftDeleteRules();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void ApplySoftDeleteRules()
+        {
+            foreach (var entry in ChangeTracker.Entries<Diploma>().Where(e => e.State == EntityState.Deleted))
+            {
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+                entry.Entity.DeletedAt ??= DateTime.UtcNow;
+            }
+
+            foreach (var entry in ChangeTracker.Entries<Quiz>().Where(e => e.State == EntityState.Deleted))
+            {
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+                entry.Entity.DeletedAt ??= DateTime.UtcNow;
+            }
+
+            foreach (var entry in ChangeTracker.Entries<Question>().Where(e => e.State == EntityState.Deleted))
+            {
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+                entry.Entity.DeletedAt ??= DateTime.UtcNow;
+            }
         }
 
         public DbSet<Diploma> Diplomas { get; set; }

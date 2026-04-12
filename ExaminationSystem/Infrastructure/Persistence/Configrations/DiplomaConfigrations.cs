@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.Domain.Entities;
+using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,21 +17,34 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
 
             // Description
             builder.Property(d => d.Description)
-                   .IsRequired()
                    .HasMaxLength(1000);
 
             builder.Property(d => d.status)
             .IsRequired()
             .HasConversion<string>();
 
-
             builder.Property(d => d.IsDeleted)
-          .HasDefaultValue(false);
+                .HasDefaultValue(false);
+
+            builder.Property(d => d.DeletedAt)
+                .IsRequired(false);
+
+            builder.HasQueryFilter(d => !d.IsDeleted);
 
             // Relationship
             builder.HasOne(d => d.CreatedByUser)
-                   .WithMany()
+                   .WithMany(u => u.CreatedDiplomas)
                    .HasForeignKey(d => d.CreatedByUserId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(d => d.Quizzes)
+                   .WithOne(q => q.Diploma)
+                   .HasForeignKey(q => q.DiplomaId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(d => d.Enrollments)
+                   .WithOne(e => e.Diploma)
+                   .HasForeignKey(e => e.DiplomaId)
                    .OnDelete(DeleteBehavior.Restrict);
 
         }

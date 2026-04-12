@@ -8,18 +8,29 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
     {
         public void Configure(EntityTypeBuilder<StudentAnswer> builder)
         {
+            builder.HasKey(x => x.Id);
+            builder.HasQueryFilter(x =>
+                !x.Question.IsDeleted &&
+                !x.Question.Quiz.IsDeleted &&
+                !x.Question.Quiz.Diploma.IsDeleted);
+
+            builder.HasOne(x => x.User)
+                .WithMany(u => u.StudentAnswers)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasOne(x => x.Attempt)
-             .WithMany()
+             .WithMany(a => a.StudentAnswers)
              .HasForeignKey(x => x.AttemptId)
              .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(x => x.Question)
-                   .WithMany()
+                   .WithMany(q => q.StudentAnswers)
                    .HasForeignKey(x => x.QuestionId)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(x => x.SelectedOption)
-                   .WithMany()
+                   .WithMany(o => o.StudentAnswers)
                    .HasForeignKey(x => x.SelectedOptionId)
                    .OnDelete(DeleteBehavior.Restrict);
         }
