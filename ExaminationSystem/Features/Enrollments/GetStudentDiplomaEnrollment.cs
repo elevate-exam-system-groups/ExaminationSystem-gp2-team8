@@ -22,7 +22,7 @@ namespace ExaminationSystem.Features.Enrollments
             var diplomaIds=await _repository.GetAll()
                 .Where(e => e.UserId == request.StudentId )
                 .Include(e=>e.Diploma)
-                .Where(e=>e.Diploma.status==Status.pulished)
+                .Where(e=>e.Diploma.status==Status.published)
                 .Select(e => e.DiplomaId)
                 .ToListAsync(cancellationToken);
             return diplomaIds;
