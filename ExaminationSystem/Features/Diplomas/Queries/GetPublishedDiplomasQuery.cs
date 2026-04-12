@@ -23,7 +23,7 @@ namespace ExaminationSystem.Features.Diplomas.Queries
         {
             var query = _repository.GetAll()
                 .Include(d => d.Quizzes)
-                .Where(d => d.status == Status.pulished);
+                .Where(d => d.status == Status.published);
                
 
             var totalCount = await query.CountAsync(cancellationToken);
