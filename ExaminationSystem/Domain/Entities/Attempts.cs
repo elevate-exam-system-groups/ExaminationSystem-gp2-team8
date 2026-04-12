@@ -10,10 +10,12 @@ namespace ExaminationSystem.Domain.Entities
 
         public int UserId { get; set; }
         public User User { get; set; } = null!;
-        public double score { get; set; }
+        public float score { get; set; }
         public DateTime StartTime { get; set; }
+        public DateTime SubmittedAt { get; set; }
         public DateTime Deadline { get; set; }
 
         public AttemptStatus Attempt { get; set; }
+        public ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();
     }
 }

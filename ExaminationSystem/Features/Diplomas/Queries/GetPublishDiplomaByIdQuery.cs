@@ -39,7 +39,7 @@ namespace ExaminationSystem.Features.Diplomas.Queries
             var diploma = _repository.GetAll()
             .Include(d => d.Quizzes)
             .ThenInclude(q => q.Attempts)
-            .Where(d => d.Id == request.id && d.status == Status.pulished)
+            .Where(d => d.Id == request.id && d.status == Status.published)
             .FirstOrDefault();
 
             if (diploma == null)
@@ -55,7 +55,7 @@ namespace ExaminationSystem.Features.Diplomas.Queries
                 Id=diploma!.Id,
                 Title=diploma.Title,
                 Quizzes=diploma.Quizzes
-                .Where(q => q.Status == Status.pulished)
+                .Where(q => q.Status == Status.published)
                 .Select(q=> new QuizforDiplomaDTO()
                 {
                     Id=q.Id,

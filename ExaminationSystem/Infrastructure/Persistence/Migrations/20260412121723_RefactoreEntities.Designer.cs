@@ -4,6 +4,7 @@ using ExaminationSystem.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ExamAppDbContext))]
-    partial class ExamAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260412121723_RefactoreEntities")]
+    partial class RefactoreEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,14 +45,11 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<float>("score")
-                        .HasColumnType("real");
+                    b.Property<double>("score")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
