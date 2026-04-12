@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="API\Filters\" />
-    <Folder Include="API\Extensions\" />
     <Folder Include="BuildingBlocks\Behaviors\" />
     <Folder Include="Domain\Events\" />
     <Folder Include="Domain\ValueObjects\" />
