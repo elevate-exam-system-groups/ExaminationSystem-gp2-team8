@@ -12,6 +12,7 @@ namespace ExaminationSystem.Domain.Entities
         public User User { get; set; } = null!;
         public float score { get; set; }
         public DateTime StartTime { get; set; }
+        public DateTime SubmittedAt { get; set; }
         public DateTime Deadline { get; set; }
 
         public AttemptStatus Attempt { get; set; }
