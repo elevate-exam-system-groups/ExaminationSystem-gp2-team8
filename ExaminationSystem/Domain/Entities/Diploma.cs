@@ -1,8 +1,8 @@
-using ExaminationSystem.Domain.Enums;
+﻿using ExaminationSystem.Domain.Enums;
 
 namespace ExaminationSystem.Domain.Entities
 {
-    public class Diploma
+    public class Diploma : IBaseEntity
     {
         public int Id { get; set; }
 

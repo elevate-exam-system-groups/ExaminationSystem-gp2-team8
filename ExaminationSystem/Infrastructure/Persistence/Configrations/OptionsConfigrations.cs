@@ -9,6 +9,11 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
         public void Configure(EntityTypeBuilder<Options> builder)
         {
             builder.HasKey(o => o.Id);
+
+            //builder.Property(o => o.CreatedAt)
+            //    .IsRequired()
+            //    .HasDefaultValueSql("GETUTCDATE()");
+
             builder.HasQueryFilter(o =>
                 !o.Question.IsDeleted &&
                 !o.Question.Quiz.IsDeleted &&

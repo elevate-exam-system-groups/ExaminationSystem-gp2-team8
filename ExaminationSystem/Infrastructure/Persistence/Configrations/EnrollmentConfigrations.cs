@@ -9,6 +9,11 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
         public void Configure(EntityTypeBuilder<Enrollment> builder)
         {
             builder.HasKey(e => e.Id);
+
+            builder.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
+
             builder.HasQueryFilter(e => !e.Diploma.IsDeleted);
 
             // Relationships

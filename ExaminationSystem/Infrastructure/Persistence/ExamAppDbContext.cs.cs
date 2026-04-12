@@ -21,26 +21,41 @@ namespace ExaminationSystem.Infrastructure.Persistence
 
         public override int SaveChanges()
         {
+            ApplyCreatedAtRules();
             ApplySoftDeleteRules();
             return base.SaveChanges();
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
+            ApplyCreatedAtRules();
             ApplySoftDeleteRules();
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            ApplyCreatedAtRules();
             ApplySoftDeleteRules();
             return base.SaveChangesAsync(cancellationToken);
         }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
+            ApplyCreatedAtRules();
             ApplySoftDeleteRules();
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void ApplyCreatedAtRules()
+        {
+            foreach (var entry in ChangeTracker.Entries<IBaseEntity>().Where(e => e.State == EntityState.Added))
+            {
+                if (entry.Entity.CreatedAt == default)
+                {
+                    entry.Entity.CreatedAt = DateTime.UtcNow;
+                }
+            }
         }
 
         private void ApplySoftDeleteRules()
