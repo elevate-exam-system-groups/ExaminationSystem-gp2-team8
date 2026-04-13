@@ -15,7 +15,7 @@
 
         public DateTime? DeletedAt { get; set; }
         public bool IsDeleted { get; set; }//Soft Delete
-
+        //public bool IsCorrect { get; set; }
 
         public int CreatedByUserId { get; set; }
 

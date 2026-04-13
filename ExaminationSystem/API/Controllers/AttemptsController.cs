@@ -4,6 +4,10 @@ using ExaminationSystem.BuildingBlocks.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.Features.Attempt.DTOS;
+using System.Threading.Tasks;
+using ExaminationSystem.Features.Attempt;
 
 namespace ExaminationSystem.API.Controllers
 {
@@ -40,6 +44,15 @@ namespace ExaminationSystem.API.Controllers
         {
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
             var result = await _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId));
+            return Ok(result);
+        }
+
+
+        [HttpGet("{attemptid}/results")]
+        public async Task<IActionResult> ViewAttemptsResult(int attemptid)
+        {
+            int studentId = _currentUserService.UserId;
+            var result = await _mediator.Send(new ViewAttemptResults(studentId, attemptid));
             return Ok(result);
         }
 
