@@ -26,14 +26,17 @@ namespace ExaminationSystem.Features.Attempt
             if (exist == null) throw new NotFoundException("this attempts is not Founded");
 
             var attempt = await _repository.GetAll()
-                        .Include(a => a.StudentAnswers)
-                            .ThenInclude(s => s.SelectedOption)
-                        .Include(a => a.Quiz)
-                            .ThenInclude(q => q.Questions)
-                            .ThenInclude(o => o.Options)
-                         .Where(a => a.Id == request.id && (a.Attempt == AttemptStatus.TimeOut || a.Attempt == AttemptStatus.Submit)
-                        && a.UserId==request.studentId )
-                         .FirstOrDefaultAsync(cancellationToken);
+                .Include(a => a.StudentAnswers)
+                    .ThenInclude(s => s.SelectedOption)
+                .Include(a => a.StudentAnswers)
+                    .ThenInclude(s => s.Question)
+                        .ThenInclude(q => q.Options)
+                .Include(a => a.Quiz)
+                    .ThenInclude(q => q.Questions)
+                .Where(a => a.Id == request.id
+                    && (a.Attempt == AttemptStatus.TimeOut || a.Attempt == AttemptStatus.Submit)
+                    && a.UserId == request.studentId)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (attempt is null) throw new ForbiddenException(" results not available until submitted ");
 
