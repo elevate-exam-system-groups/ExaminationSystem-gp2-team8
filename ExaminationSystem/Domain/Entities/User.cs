@@ -21,5 +21,8 @@ namespace ExaminationSystem.Domain.Entities
         public ICollection<Attempts> Attempts { get; set; } = new List<Attempts>();
         public ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();
 
+        // Authentication //
+        public DateTime? DeletedAt { get; set; }
+
     }
 }
