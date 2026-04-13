@@ -18,9 +18,11 @@ namespace ExaminationSystem.Features.Attempts.GetAttempts
         }
         public async Task<PaginatedResult<QuizHistoryDto>> Handle(GetStudentAttemptQuery request, CancellationToken cancellationToken)
         {
-            var query = _dbContext.Attempts.Where(a => a.UserId == request.StudentId);
+            var query = _dbContext.Attempts
+                .AsNoTracking()
+                .Where(a => a.UserId == request.StudentId && a.Attempt != Domain.Enums.AttemptStatus.InProgress);
 
-            if(request.quizId.HasValue)
+            if (request.quizId.HasValue)
                 query = query.Where(a=> a.QuizId == request.quizId);
 
             if (request.diplomaId.HasValue)
