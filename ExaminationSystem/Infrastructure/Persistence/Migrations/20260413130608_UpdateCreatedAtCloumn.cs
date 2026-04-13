@@ -13,10 +13,31 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
         {
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAt",
+                table: "StudentAnswers",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "CreatedAt",
                 table: "Quizzes",
                 type: "datetime2",
                 nullable: false,
                 defaultValueSql: "GETUTCDATE()");
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "CreatedAt",
+                table: "Questions",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "CreatedAt",
+                table: "Options",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAt",
@@ -36,6 +57,13 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAt",
+                table: "Attempts",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "CreatedAt",
                 table: "AspNetUsers",
                 type: "datetime2",
                 nullable: false,
@@ -47,11 +75,27 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "CreatedAt",
+                table: "StudentAnswers");
+
+            migrationBuilder.DropColumn(
+                name: "CreatedAt",
                 table: "Quizzes");
 
             migrationBuilder.DropColumn(
                 name: "CreatedAt",
+                table: "Questions");
+
+            migrationBuilder.DropColumn(
+                name: "CreatedAt",
+                table: "Options");
+
+            migrationBuilder.DropColumn(
+                name: "CreatedAt",
                 table: "Enrollments");
+
+            migrationBuilder.DropColumn(
+                name: "CreatedAt",
+                table: "Attempts");
 
             migrationBuilder.DropColumn(
                 name: "CreatedAt",

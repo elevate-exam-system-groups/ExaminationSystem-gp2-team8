@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ExamAppDbContext))]
-    [Migration("20260412172920_UpdateCreatedAtCloumn")]
+    [Migration("20260413130608_UpdateCreatedAtCloumn")]
     partial class UpdateCreatedAtCloumn
     {
         /// <inheritdoc />
@@ -35,6 +35,9 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("Attempt")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Deadline")
                         .HasColumnType("datetime2");
@@ -152,6 +155,9 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("bit");
 
@@ -176,6 +182,9 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("CreatedByUserId")
                         .HasColumnType("int");
@@ -275,6 +284,9 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("AttemptId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
