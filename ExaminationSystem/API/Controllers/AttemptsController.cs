@@ -2,7 +2,6 @@
 using ExaminationSystem.Features.Attempts.GetAttemptDetails;
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExaminationSystem.API.Controllers
@@ -22,24 +21,24 @@ namespace ExaminationSystem.API.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetQuizHistory(
-            [FromQuery] int? quizId, 
-            [FromQuery] int? diplomaId, 
-            [FromQuery] int page= 1, 
-            [FromQuery] int perPage= 20)
+            [FromQuery(Name = "quiz_id")] int? quizId,
+            [FromQuery(Name = "diploma_id")] int? diplomaId,
+            [FromQuery(Name = "page")] int page = 1,
+            [FromQuery(Name = "per_page")] int perPage = 20,
+            CancellationToken cancellationToken = default)
         {
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
             var query = new GetStudentAttemptQuery(studentId, quizId, diplomaId, page, perPage);
-            var history = await _mediator.Send(query);
+            var history = await _mediator.Send(query, cancellationToken);
 
-            if (!history.Data.Any()) return NotFound();
             return Ok(history);
         }
 
         [HttpGet("{attemptId:int}")]
-        public async Task<IActionResult> GetAttemptDetails(int attemptId)
+        public async Task<IActionResult> GetAttemptDetails(int attemptId, CancellationToken cancellationToken = default)
         {
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
-            var result = await _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId));
+            var result = await _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId), cancellationToken);
             return Ok(result);
         }
 
