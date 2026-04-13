@@ -2,7 +2,8 @@
 {
     public enum UserStatus
     {
-        Admin=1,
-        Student
+        Pending = 1,
+        Active,
+        Locked
     }
 }
