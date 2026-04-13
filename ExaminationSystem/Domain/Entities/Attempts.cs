@@ -2,9 +2,10 @@
 
 namespace ExaminationSystem.Domain.Entities
 {
-    public class Attempts
+    public class Attempts : IBaseEntity
     {
         public int Id { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int QuizId { get; set; }
         public Quiz Quiz { get; set; } = null!;
 

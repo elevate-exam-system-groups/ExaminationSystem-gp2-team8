@@ -1,8 +1,9 @@
 ﻿namespace ExaminationSystem.Domain.Entities
 {
-    public class Options
+    public class Options : IBaseEntity
     {
         public int Id { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int QuestionId { get; set; }
         public Question Question { get; set; } = null!;
         public string OptionText { get; set; } = null!;
