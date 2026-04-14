@@ -18,7 +18,7 @@ namespace ExaminationSystem.API.Controllers
         {
             _mediator = mediator;
         }
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody] UserForRegisterationDto user)
         {
 
