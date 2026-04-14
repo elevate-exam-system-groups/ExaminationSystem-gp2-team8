@@ -14,6 +14,6 @@ namespace ExaminationSystem.Features.Users.DTOs
         public string? Password { get; init; }
 
         
-        public UserStatus UserStatus { get; set; }
+        //public UserStatus UserStatus { get; set; }
     }
 }

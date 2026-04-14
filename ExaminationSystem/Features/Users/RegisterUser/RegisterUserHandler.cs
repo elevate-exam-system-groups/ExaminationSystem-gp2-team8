@@ -27,10 +27,10 @@ namespace ExaminationSystem.Features.Users.RegisterUser
             }
             var user = new User()
             {
-                
+
                 FullName = request.userDto.FullName,
                 Email = request.userDto.Email,
-                Status = request.userDto.UserStatus
+                Status = UserStatus.Pending
             };
 
             var result = await _userManager.CreateAsync(user, request.userDto.Password);
