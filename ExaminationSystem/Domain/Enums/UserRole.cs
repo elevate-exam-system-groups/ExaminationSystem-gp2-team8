@@ -1,8 +1,8 @@
 ﻿namespace ExaminationSystem.Domain.Enums
 {
-    public enum Status
+    public enum UserRole
     {
-        Published = 1,
-        Draft
+        Admin=1,
+        Student
     }
 }

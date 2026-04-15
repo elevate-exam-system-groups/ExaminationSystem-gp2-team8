@@ -13,6 +13,7 @@ namespace ExaminationSystem.Domain.Entities
 
         public string? RefreshToken { get; set; }
 
+        public UserRole Role { get; set; }
         public UserStatus Status { get; set; }
 
     }
