@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Infrastructure.Persistence.Reposteries
 {
-    public class GenericRepository<TEntity>(StoreDbContext _dbContext) 
+    public class GenericRepository<TEntity>(ExamAppDbContext _dbContext) 
         : IGenericRepository<TEntity> where TEntity : class
     {
         public async Task AddAsync(TEntity entity)

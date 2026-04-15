@@ -1,13 +1,12 @@
 ﻿using ExaminationSystem.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace ExaminationSystem.Infrastructure.Persistence
+namespace ExaminationSystem.Infrastructure.Persistence.Data
 {
     public class ExamAppDbContext
-     : IdentityDbContext<User, IdentityRole<int>, int>
+        : IdentityDbContext<User, IdentityRole<int>, int>
     {
         public ExamAppDbContext(DbContextOptions<ExamAppDbContext> options)
             : base(options)

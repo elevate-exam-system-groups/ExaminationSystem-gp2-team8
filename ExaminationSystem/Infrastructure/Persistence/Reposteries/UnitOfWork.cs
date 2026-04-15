@@ -7,9 +7,9 @@ namespace ExaminationSystem.Infrastructure.Persistence.Reposteries
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly StoreDbContext _dbContext;
+        private readonly ExamAppDbContext _dbContext;
         private readonly Dictionary<string,object> _repositories;
-        public UnitOfWork(StoreDbContext dbContext) 
+        public UnitOfWork(ExamAppDbContext dbContext) 
         {
             _dbContext = dbContext;
             _repositories = new();
