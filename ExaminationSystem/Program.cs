@@ -1,4 +1,5 @@
 
+using ExaminationSystem.API.Extensions;
 using ExaminationSystem.API.Middlewares;
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Features.Diplomas.Queries;
@@ -13,7 +14,7 @@ namespace ExaminationSystem
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +31,10 @@ namespace ExaminationSystem
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
+            builder.Services.AddAuthentication();
+            builder.Services.ConfigureIdentity();
+            builder.Services.AddInfrastructureServices();
 
-            
             builder.Services.AddMediatR(typeof(Program).Assembly);
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddHttpContextAccessor();
@@ -40,7 +43,7 @@ namespace ExaminationSystem
 
             var app = builder.Build();
 
-
+            await app.SeedRolesAsync();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
