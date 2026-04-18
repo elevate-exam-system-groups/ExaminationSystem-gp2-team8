@@ -12,6 +12,13 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
                 .IsRequired()
                 .HasDefaultValueSql("GETUTCDATE()");
 
+            builder.Property(user => user.FullName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(user => user.Status)
+                .HasConversion<string>();
+
             builder.Property(user => user.IsDeleted)
                 .HasDefaultValue(false);
 

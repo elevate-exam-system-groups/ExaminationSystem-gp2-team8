@@ -26,7 +26,8 @@ namespace ExaminationSystem.Infrastructure.Persistence.Repositories
             await _dbcontext.Set<TEntity>().ToListAsync();
 
         public async Task<TEntity?> GetByIdAsync(int id) =>
-            await _dbcontext.Set<TEntity>().FindAsync(id);
+            await _dbcontext.Set<TEntity>()
+                .FirstOrDefaultAsync(entity => EF.Property<int>(entity, nameof(IBaseEntity.Id)) == id);
 
         public IQueryable<TEntity> Query() => _dbcontext.Set<TEntity>().AsQueryable();
 
