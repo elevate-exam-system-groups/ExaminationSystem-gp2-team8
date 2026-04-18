@@ -19,7 +19,7 @@
 
         public int CreatedByUserId { get; set; }
 
-        public User CreatedByUser { get; set; } = null!;
+        public Admin CreatedByUser { get; set; } = null!;
 
         public ICollection<Options> Options { get; set; } = new List<Options>();
         public ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();

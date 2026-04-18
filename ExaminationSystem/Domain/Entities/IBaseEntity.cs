@@ -4,5 +4,6 @@ namespace ExaminationSystem.Domain.Entities
     {
         int Id { get; set; }
         DateTime CreatedAt { get; set; }
+
     }
 }

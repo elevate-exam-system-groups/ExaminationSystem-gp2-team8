@@ -17,6 +17,12 @@ namespace ExaminationSystem.Infrastructure.Persistence
         {
             base.OnModelCreating(builder);
             builder.ApplyConfigurationsFromAssembly(typeof(ExamAppDbContext).Assembly);
+
+            builder.Entity<User>()
+                  .HasDiscriminator<string>("UserType")
+                  .HasValue<User>("User")
+                  .HasValue<Admin>("Admin")
+                  .HasValue<Student>("Student");
         }
 
         public override int SaveChanges()

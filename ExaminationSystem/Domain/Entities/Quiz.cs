@@ -21,7 +21,7 @@ namespace ExaminationSystem.Domain.Entities
         public bool IsDeleted { get; set; }//Soft Delete
         //  FK
         public int CreatedByUserId { get; set; }
-        public User CreatedByUser { get; set; } = null!;
+        public Admin CreatedByUser { get; set; } = null!;
 
         public int DiplomaId { get; set; }
         public Diploma Diploma { get; set; } = null!;

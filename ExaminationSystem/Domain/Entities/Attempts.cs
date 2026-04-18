@@ -9,7 +9,7 @@ namespace ExaminationSystem.Domain.Entities
         public Quiz Quiz { get; set; } = null!;
 
         public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public Student User { get; set; } = null!;
         public float score { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime SubmittedAt { get; set; }
