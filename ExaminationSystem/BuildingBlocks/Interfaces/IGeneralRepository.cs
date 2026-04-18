@@ -7,7 +7,7 @@ namespace ExaminationSystem.BuildingBlocks.Interfaces
         Task AddAsync(TEntity entity);
         void Update(TEntity entity);
         void Delete(TEntity entity);
-        public IQueryable<TEntity> Query();
+        IQueryable<TEntity> Query();
         Task<int> SaveChangesAsync();
     }
 }

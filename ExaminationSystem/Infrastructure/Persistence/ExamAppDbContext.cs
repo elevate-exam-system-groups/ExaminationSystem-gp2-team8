@@ -1,12 +1,10 @@
-﻿using ExaminationSystem.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Infrastructure.Persistence
 {
     public class ExamAppDbContext
-     : IdentityDbContext<User, IdentityRole<int>, int>
+     : DbContext
     {
         public ExamAppDbContext(DbContextOptions<ExamAppDbContext> options)
             : base(options)
@@ -75,6 +73,7 @@ namespace ExaminationSystem.Infrastructure.Persistence
         public DbSet<Quiz> Quizzes { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     }
