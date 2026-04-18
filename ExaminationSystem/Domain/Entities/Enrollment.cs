@@ -9,5 +9,7 @@
         public int DiplomaId { get; set; }
         public Diploma Diploma { get; set; }=null!;
         public DateTime EnrollmentDate { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }

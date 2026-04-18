@@ -15,6 +15,8 @@ namespace ExaminationSystem.Domain.Entities
         public DateTime StartTime { get; set; }
         public DateTime SubmittedAt { get; set; }
         public DateTime Deadline { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         public AttemptStatus Attempt { get; set; }
         public ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();

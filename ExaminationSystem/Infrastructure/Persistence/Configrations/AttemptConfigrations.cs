@@ -10,11 +10,14 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
         {
             builder.HasKey(a => a.Id);
 
-            //builder.Property(a => a.CreatedAt)
-            //    .IsRequired()
-            //    .HasDefaultValueSql("GETUTCDATE()");
+            builder.Property(a => a.IsDeleted)
+                .HasDefaultValue(false);
+
+            builder.Property(a => a.DeletedAt)
+                .IsRequired(false);
 
             builder.HasQueryFilter(a =>
+                !a.IsDeleted &&
                 !a.Quiz.IsDeleted &&
                 !a.Quiz.Diploma.IsDeleted);
 

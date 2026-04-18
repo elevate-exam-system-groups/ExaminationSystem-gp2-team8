@@ -4,5 +4,7 @@ namespace ExaminationSystem.Domain.Entities
     {
         int Id { get; set; }
         DateTime CreatedAt { get; set; }
+        bool IsDeleted { get; set; }
+        DateTime? DeletedAt { get; set; }
     }
 }

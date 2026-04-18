@@ -60,21 +60,7 @@ namespace ExaminationSystem.Infrastructure.Persistence
 
         private void ApplySoftDeleteRules()
         {
-            foreach (var entry in ChangeTracker.Entries<Diploma>().Where(e => e.State == EntityState.Deleted))
-            {
-                entry.State = EntityState.Modified;
-                entry.Entity.IsDeleted = true;
-                entry.Entity.DeletedAt ??= DateTime.UtcNow;
-            }
-
-            foreach (var entry in ChangeTracker.Entries<Quiz>().Where(e => e.State == EntityState.Deleted))
-            {
-                entry.State = EntityState.Modified;
-                entry.Entity.IsDeleted = true;
-                entry.Entity.DeletedAt ??= DateTime.UtcNow;
-            }
-
-            foreach (var entry in ChangeTracker.Entries<Question>().Where(e => e.State == EntityState.Deleted))
+            foreach (var entry in ChangeTracker.Entries<IBaseEntity>().Where(e => e.State == EntityState.Deleted))
             {
                 entry.State = EntityState.Modified;
                 entry.Entity.IsDeleted = true;

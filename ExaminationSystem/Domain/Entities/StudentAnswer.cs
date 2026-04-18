@@ -12,5 +12,7 @@
         public Question Question { get; set; } = null!;
         public int SelectedOptionId { get; set; }
         public Options SelectedOption { get; set; } = null!;
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }

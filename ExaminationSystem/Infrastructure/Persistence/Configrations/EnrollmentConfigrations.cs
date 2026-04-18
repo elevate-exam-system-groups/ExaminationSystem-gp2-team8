@@ -14,7 +14,13 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
                 .IsRequired()
                 .HasDefaultValueSql("GETUTCDATE()");
 
-            builder.HasQueryFilter(e => !e.Diploma.IsDeleted);
+            builder.Property(e => e.IsDeleted)
+                .HasDefaultValue(false);
+
+            builder.Property(e => e.DeletedAt)
+                .IsRequired(false);
+
+            builder.HasQueryFilter(e => !e.IsDeleted && !e.Diploma.IsDeleted);
 
             // Relationships
             builder.HasOne(e => e.User)

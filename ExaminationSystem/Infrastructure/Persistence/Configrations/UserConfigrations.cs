@@ -11,6 +11,14 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
             builder.Property(user => user.CreatedAt)
                 .IsRequired()
                 .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(user => user.IsDeleted)
+                .HasDefaultValue(false);
+
+            builder.Property(user => user.DeletedAt)
+                .IsRequired(false);
+
+            builder.HasQueryFilter(user => !user.IsDeleted);
         }
     }
 }
