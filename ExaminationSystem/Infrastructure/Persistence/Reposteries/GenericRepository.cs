@@ -1,4 +1,5 @@
-﻿using ExaminationSystem.Domain.Contracts;
+using ExaminationSystem.Domain.Contracts;
+using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Infrastructure.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,16 @@ namespace ExaminationSystem.Infrastructure.Persistence.Reposteries
         => await _dbContext.Set<TEntity>().AddAsync(entity);
 
         public void Delete(TEntity entity)
-         => _dbContext.Set<TEntity>().Remove(entity);
+        {
+            if (entity is not IBaseEntity softDeletableEntity)
+            {
+                throw new InvalidOperationException($"{typeof(TEntity).Name} must implement IBaseEntity to support soft delete.");
+            }
+
+            softDeletableEntity.IsDeleted = true;
+            softDeletableEntity.DeletedAt = DateTime.UtcNow;
+            _dbContext.Set<TEntity>().Update(entity);
+        }
            
         
 

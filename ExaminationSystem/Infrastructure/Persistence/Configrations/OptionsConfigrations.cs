@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.Domain.Entities;
+using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

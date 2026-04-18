@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.Domain.Entities;
+using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,7 +20,7 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
             builder.Property(e => e.DeletedAt)
                 .IsRequired(false);
 
-            builder.HasQueryFilter(e => !e.IsDeleted && !e.Diploma.IsDeleted);
+            builder.HasQueryFilter(e => !e.IsDeleted && !e.Diploma.IsDeleted && !e.User.IsDeleted);
 
             // Relationships
             builder.HasOne(e => e.User)

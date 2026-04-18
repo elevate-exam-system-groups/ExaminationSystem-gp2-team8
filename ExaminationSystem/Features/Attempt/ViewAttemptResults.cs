@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.ExceptionHandling;
 using ExaminationSystem.BuildingBlocks.Exceptions;
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
@@ -20,12 +20,12 @@ namespace ExaminationSystem.Features.Attempt
         }
         public async Task<ApiResponse<ViewResultDTO>> Handle(ViewAttemptResults request, CancellationToken cancellationToken)
         {
-            var exist =await _repository.GetByIdAsync(request.id);
+            var exist = await _repository.GetByIdAsync(request.id);
 
 
             if (exist == null) throw new NotFoundException("this attempts is not Founded");
 
-            var attempt = await _repository.GetAll()
+            var attempt = await _repository.Query()
                         .Include(a => a.StudentAnswers)
                             .ThenInclude(s => s.SelectedOption)
                         .Include(a => a.Quiz)

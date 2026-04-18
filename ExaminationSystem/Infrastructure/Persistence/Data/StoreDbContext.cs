@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.Domain.Entities;
+using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Infrastructure.Persistence.Data
@@ -12,6 +12,41 @@ namespace ExaminationSystem.Infrastructure.Persistence.Data
         {
            modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
         }
+
+        public override int SaveChanges()
+        {
+            ApplySoftDeleteRules();
+            return base.SaveChanges();
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            ApplySoftDeleteRules();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            ApplySoftDeleteRules();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            ApplySoftDeleteRules();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void ApplySoftDeleteRules()
+        {
+            foreach (var entry in ChangeTracker.Entries<IBaseEntity>().Where(e => e.State == EntityState.Deleted))
+            {
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+                entry.Entity.DeletedAt = DateTime.UtcNow;
+            }
+        }
+
         public DbSet<Attempts> Attempts { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Diploma> Diplomas { get; set; }
