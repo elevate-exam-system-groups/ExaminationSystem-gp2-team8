@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.ExceptionHandling;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
 using ExaminationSystem.Features.Users.DTOs;
@@ -19,15 +19,29 @@ namespace ExaminationSystem.Features.Users.RegisterUser
         }
         public async Task<ApiResponse<RegisterResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
-           
+            if (string.IsNullOrWhiteSpace(request.userDto.FullName))
+            {
+                return ApiResponse<RegisterResponseDto>.Fail("Full name is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.userDto.Email))
+            {
+                return ApiResponse<RegisterResponseDto>.Fail("Email is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.userDto.Password))
+            {
+                return ApiResponse<RegisterResponseDto>.Fail("Password is required.");
+            }
+
             var existing = await _userManager.FindByEmailAsync(request.userDto.Email);
             if (existing is not null)
             {
                 return ApiResponse<RegisterResponseDto>.Fail("An account with this email already exists.");
             }
+
             var user = new User()
             {
-
                 FullName = request.userDto.FullName,
                 Email = request.userDto.Email,
                 Status = UserStatus.Pending

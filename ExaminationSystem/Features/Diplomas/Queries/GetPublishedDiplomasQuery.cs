@@ -1,11 +1,10 @@
-﻿using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
 using ExaminationSystem.Features.Diplomas.DTOS;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ExaminationSystem.Features.Diplomas.Queries
 {
@@ -21,23 +20,24 @@ namespace ExaminationSystem.Features.Diplomas.Queries
         }
         public async Task<PaginatedResult<DiplomapublishedDto>> Handle(GetPublishedDiplomasQuery request, CancellationToken cancellationToken)
         {
-            var query = _repository.GetAll()
-                .Include(d => d.Quizzes)
+            var query = _repository.Query()
+                .AsNoTracking()
                 .Where(d => d.status == Status.published);
-               
 
             var totalCount = await query.CountAsync(cancellationToken);
 
-
-            var diplomas=await query.ToListAsync(cancellationToken);
-
-            var diplomaDtos = diplomas.Select(d => new DiplomapublishedDto
-            {
-                Id = d.Id,
-                Title = d.Title,
-                Description = d.Description,
-                QuizCount = d.Quizzes.Count
-            }).ToList();
+            var diplomaDtos = await query
+                .OrderBy(d => d.Id)
+                .Skip((request.Page - 1) * request.PerPage)
+                .Take(request.PerPage)
+                .Select(d => new DiplomapublishedDto
+                {
+                    Id = d.Id,
+                    Title = d.Title,
+                    Description = d.Description ?? string.Empty,
+                    QuizCount = d.Quizzes.Count
+                })
+                .ToListAsync(cancellationToken);
 
             return new PaginatedResult<DiplomapublishedDto>(diplomaDtos, totalCount, request.Page, request.PerPage);
         }
