@@ -16,6 +16,7 @@ namespace ExaminationSystem.Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
             builder.ApplyConfigurationsFromAssembly(typeof(ExamAppDbContext).Assembly);
 
             builder.Entity<User>()
