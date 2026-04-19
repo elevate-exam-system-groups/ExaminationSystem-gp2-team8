@@ -20,9 +20,7 @@ namespace ExaminationSystem.Domain.Entities
         public ICollection<Diploma> CreatedDiplomas { get; set; } = new List<Diploma>();
         public ICollection<Quiz> CreatedQuizzes { get; set; } = new List<Quiz>();
         public ICollection<Question> CreatedQuestions { get; set; } = new List<Question>();
-        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
-        public ICollection<Attempts> Attempts { get; set; } = new List<Attempts>();
-        public ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();
+
 
     }
 }
