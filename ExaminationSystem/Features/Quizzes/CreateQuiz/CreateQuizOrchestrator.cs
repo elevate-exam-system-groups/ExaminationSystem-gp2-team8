@@ -1,52 +1,80 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.Exceptions;
+using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Features.Quizzes.DTOS;
-using ExaminationSystem.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Features.Quizzes.CreateQuiz
 {
-    public class CreateQuizOrchestrator : IRequestHandler<CreateQuizCommand, ApiResponse<CreateQuizResponse>>
+    public class CreateQuizOrchestrator : IRequestHandler<CreateQuizCommand, CreateQuizResponse>
     {
-        private readonly ExamAppDbContext _dbContext;
+        private readonly IGeneralRepository<Quiz> _quizRepository;
+        private readonly IGeneralRepository<Diploma> _diplomaRepository;
 
-        public CreateQuizOrchestrator(ExamAppDbContext dbContext)
+        public CreateQuizOrchestrator(
+            IGeneralRepository<Quiz> quizRepository,
+            IGeneralRepository<Diploma> diplomaRepository)
         {
-            _dbContext = dbContext;
+            _quizRepository = quizRepository;
+            _diplomaRepository = diplomaRepository;
         }
-        public async Task<ApiResponse<CreateQuizResponse>> Handle(CreateQuizCommand request, CancellationToken cancellationToken)
+        public async Task<CreateQuizResponse> Handle(CreateQuizCommand request, CancellationToken cancellationToken)
         {
-            var dto = request.dto;
-
-            var diploma = await _dbContext.Diplomas.AnyAsync(d => d.Id == dto.DiplomaId, cancellationToken);
-
-            if (!diploma) return ApiResponse<CreateQuizResponse>.FailureResponse("Diploma Not Found", "404");
-
-            if (string.IsNullOrWhiteSpace(dto.Title))
-                return ApiResponse<CreateQuizResponse>.FailureResponse("Title is required", "422");
-
-            if (dto.DurationMinutes <= 0)
-                return ApiResponse<CreateQuizResponse>.FailureResponse("DurationMinutes must be a positive integer", "422");
-
-            if (dto.PassScore is < 0 or > 100)
-                return ApiResponse<CreateQuizResponse>.FailureResponse("PassScore must be between 0 and 100", "422");
+            await ValidateRequestAsync(request, cancellationToken);
 
             var quiz = new Quiz
             {
-                Title = dto.Title,
-                DiplomaId = dto.DiplomaId,
-                DurationMinutes = dto.DurationMinutes,
-                Instructions = dto.Instructions, 
-                MaxAttempts = dto.MaxAttempts, 
-                PassScore = dto.PassScore,
+                Title = request.dto.Title.Trim(),
+                DiplomaId = request.dto.DiplomaId,
+                DurationMinutes = request.dto.DurationMinutes,
+                Instructions = request.dto.Instructions?.Trim(),
+                MaxAttempts = request.dto.MaxAttempts,
+                PassScore = request.dto.PassScore,
                 Status = Domain.Enums.Status.Draft,
             };
 
-            _dbContext.Quizzes.Add(quiz);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _quizRepository.AddAsync(quiz);
+            await _quizRepository.SaveChangesAsync();
 
-            return ApiResponse<CreateQuizResponse>.SuccessResponse(new CreateQuizResponse(
+            return MapToResponse(quiz);
+        }
+
+        private async Task ValidateRequestAsync(CreateQuizCommand request, CancellationToken cancellationToken)
+        {
+            ValidateQuiz(request.dto);
+
+            var diplomaExists = await _diplomaRepository.Query()
+                .AsNoTracking()
+                .AnyAsync(d => d.Id == request.dto.DiplomaId, cancellationToken);
+
+            if (!diplomaExists)
+            {
+                throw new NotFoundException("Diploma Not Found");
+            }
+        }
+
+        private static void ValidateQuiz(CreateQuizDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Title))
+            {
+                throw new ValidationException("Title is required");
+            }
+
+            if (dto.DurationMinutes <= 0)
+            {
+                throw new ValidationException("DurationMinutes must be a positive integer");
+            }
+
+            if (dto.PassScore is < 0 or > 100)
+            {
+                throw new ValidationException("PassScore must be between 0 and 100");
+            }
+        }
+
+        private static CreateQuizResponse MapToResponse(Quiz quiz)
+        {
+            return new CreateQuizResponse(
                 quiz.Id,
                 quiz.Title,
                 quiz.DiplomaId,
@@ -55,7 +83,6 @@ namespace ExaminationSystem.Features.Quizzes.CreateQuiz
                 quiz.MaxAttempts,
                 quiz.Instructions,
                 quiz.Status.ToString()
-                )
             );
         }
     }

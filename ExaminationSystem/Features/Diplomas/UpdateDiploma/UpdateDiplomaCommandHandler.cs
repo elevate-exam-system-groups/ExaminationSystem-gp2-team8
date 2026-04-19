@@ -1,30 +1,51 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.Exceptions;
+using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Features.Diplomas.DTOS;
-using ExaminationSystem.Infrastructure.Persistence;
 using MediatR;
 
 namespace ExaminationSystem.Features.Diplomas.UpdateDiploma
 {
-    public class UpdateDiplomaCommandHandler : IRequestHandler<UpdateDiplomaCommand, ApiResponse<UpdateDiplomaDto>>
+    public class UpdateDiplomaCommandHandler : IRequestHandler<UpdateDiplomaCommand, UpdateDiplomaDto>
     {
-        private readonly ExamAppDbContext _dbContext;
+        private readonly IGeneralRepository<Diploma> _repository;
 
-        public UpdateDiplomaCommandHandler(ExamAppDbContext dbContext)
+        public UpdateDiplomaCommandHandler(IGeneralRepository<Diploma> repository)
         {
-            _dbContext = dbContext;
+            _repository = repository;
         }
-        public async Task<ApiResponse<UpdateDiplomaDto>> Handle(UpdateDiplomaCommand request, CancellationToken cancellationToken)
+        public async Task<UpdateDiplomaDto> Handle(UpdateDiplomaCommand request, CancellationToken cancellationToken)
         {
-            var diploma = await _dbContext.Diplomas.FindAsync(request.id);
-            if (diploma == null) return ApiResponse<UpdateDiplomaDto>.FailureResponse("Diploma Not Found", "404");
+            ValidateRequest(request);
 
-            diploma.Title = request.title;
-            diploma.Description = request.description;
+            var diploma = await _repository.GetByIdAsync(request.id)
+                ?? throw new NotFoundException("Diploma Not Found");
 
-            _dbContext.Update(diploma);
-            await _dbContext.SaveChangesAsync();
+            diploma.Title = request.title.Trim();
+            diploma.Description = request.description?.Trim();
 
-            return ApiResponse<UpdateDiplomaDto>.SuccessResponse(new UpdateDiplomaDto() {Id = diploma.Id, Title = diploma.Title, Description = diploma.Description});
+            _repository.Update(diploma);
+            await _repository.SaveChangesAsync();
+
+            return MapToDto(diploma);
+        }
+
+        private static void ValidateRequest(UpdateDiplomaCommand request)
+        {
+            if (string.IsNullOrWhiteSpace(request.title))
+            {
+                throw new ValidationException("Diploma title is required");
+            }
+        }
+
+        private static UpdateDiplomaDto MapToDto(Diploma diploma)
+        {
+            return new UpdateDiplomaDto
+            {
+                Id = diploma.Id,
+                Title = diploma.Title,
+                Description = diploma.Description
+            };
         }
     }
 }

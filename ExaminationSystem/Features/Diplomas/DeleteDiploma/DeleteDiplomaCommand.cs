@@ -1,9 +1,8 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
-using MediatR;
+﻿using MediatR;
 
 namespace ExaminationSystem.Features.Diplomas.DeleteDiploma
 {
-    public record DeleteDiplomaCommand(int id) : IRequest<ApiResponse<bool>>
+    public record DeleteDiplomaCommand(int id) : IRequest<bool>
     {
     }
 }

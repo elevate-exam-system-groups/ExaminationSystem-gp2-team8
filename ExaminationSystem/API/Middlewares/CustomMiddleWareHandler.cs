@@ -21,13 +21,15 @@ namespace ExaminationSystem.API.Middlewares
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, "someThing Wrong");
+                _logger.LogError(ex, "Something Went Wrong");
                 //1-set Code
 
                 var (statusCode, code) = ex switch
                 {
                     NotFoundException => (404, "404"),   
                     ForbiddenException => (403, "403"),
+                    ConflictException => (409, "409"),
+                    ValidationException => (422, "422"),
                     UnauthorizedException => (401, "401"),
                     _ => (500, "INTERNAL_SERVER_ERROR")
                 };

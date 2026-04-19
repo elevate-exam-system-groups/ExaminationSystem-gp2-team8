@@ -1,36 +1,52 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.Exceptions;
+using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
-using ExaminationSystem.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Features.Quizzes.DeleteQuiz.DeleteQuestion
 {
-    public class DeleteQuestionCommandHandler : IRequestHandler<DeleteQuestionCommand, ApiResponse<bool>>
+    public class DeleteQuestionCommandHandler : IRequestHandler<DeleteQuestionCommand, bool>
     {
-        private readonly ExamAppDbContext _dbContext;
+        private readonly IGeneralRepository<Question> _repository;
 
-        public DeleteQuestionCommandHandler(ExamAppDbContext dbContext)
+        public DeleteQuestionCommandHandler(IGeneralRepository<Question> repository)
         {
-            _dbContext = dbContext;
+            _repository = repository;
         }
-        public async Task<ApiResponse<bool>> Handle(DeleteQuestionCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteQuestionCommand request, CancellationToken cancellationToken)
         {
-            var question = await _dbContext.Questions
-                .Include(q => q.Quiz)
-                .FirstOrDefaultAsync(q => q.Id == request.questionId, cancellationToken);
+            await ValidateRequestAsync(request, cancellationToken);
 
-            if (question == null) return ApiResponse<bool>.FailureResponse("Question Not Found", "404");
+            var question = await _repository.GetByIdAsync(request.questionId)
+                ?? throw new NotFoundException("Question Not Found");
 
-            if (question.Quiz.Status == Status.published)
-                return ApiResponse<bool>.FailureResponse("Cannot delete question while quiz is published", "409");
+            _repository.Delete(question);
+            await _repository.SaveChangesAsync();
 
-            question.IsDeleted = true;
-            question.DeletedAt = DateTime.UtcNow;
-
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return ApiResponse<bool>.SuccessResponse(true);
+            return true;
         }
+
+        private async Task ValidateRequestAsync(DeleteQuestionCommand request, CancellationToken cancellationToken)
+        {
+            var questionState = await _repository.Query()
+                .AsNoTracking()
+                .Where(q => q.Id == request.questionId)
+                .Select(q => new QuestionDeleteState(q.Id, q.Quiz.Status))
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (questionState is null)
+            {
+                throw new NotFoundException("Question Not Found");
+            }
+
+            if (questionState.QuizStatus == Status.published)
+            {
+                throw new ConflictException("Cannot delete question while quiz is published");
+            }
+        }
+
+        private sealed record QuestionDeleteState(int Id, Status QuizStatus);
     }
 }

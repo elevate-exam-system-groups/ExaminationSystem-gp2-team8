@@ -1,61 +1,85 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.Exceptions;
+using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
-using ExaminationSystem.Infrastructure.Persistence;
+using ExaminationSystem.Features.Quizzes.DTOS;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Features.Quizzes.CreateQuiz.CreateQuestions
 {
-    public class CreateQuestionsCommandHandler : IRequestHandler<CreateQuestionsCommand, ApiResponse<int>>
+    public class CreateQuestionsCommandHandler : IRequestHandler<CreateQuestionsCommand, int>
     {
-        private readonly ExamAppDbContext _dbContext;
+        private readonly IGeneralRepository<Quiz> _quizRepository;
+        private readonly IGeneralRepository<Question> _questionRepository;
 
-        public CreateQuestionsCommandHandler(ExamAppDbContext dbContext)
+        public CreateQuestionsCommandHandler(
+            IGeneralRepository<Quiz> quizRepository,
+            IGeneralRepository<Question> questionRepository)
         {
-            _dbContext = dbContext;
+            _quizRepository = quizRepository;
+            _questionRepository = questionRepository;
         }
-        public async Task<ApiResponse<int>> Handle(CreateQuestionsCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateQuestionsCommand request, CancellationToken cancellationToken)
         {
-            var quiz = await _dbContext.Quizzes
-                .FirstOrDefaultAsync(q => q.Id == request.quizId, cancellationToken);
-
-            if (quiz is null) return ApiResponse<int>.FailureResponse("Quiz Not Found", "404");
-
-            var dto = request.dto;
-
-            if (string.IsNullOrWhiteSpace(dto.QuestionText))
-                return ApiResponse<int>.FailureResponse("Question text is required", "422");
-
-            if (dto.Options.Count < 2)
-                return ApiResponse<int>.FailureResponse("Question must have at least 2 options", "422");
-
-            if (dto.Options.Count(o => o.IsCorrect) != 1)
-                return ApiResponse<int>.FailureResponse("Exactly one correct option required", "422");
-
-            if (dto.Options.Any(o => string.IsNullOrWhiteSpace(o.OptionText)))
-                return ApiResponse<int>.FailureResponse("Option text is required", "422");
+            await ValidateRequestAsync(request, cancellationToken);
 
             var question = new Question
             {
-                QuestionText = dto.QuestionText,
-                Explanation = dto.Explanation,
-                Quiz = quiz,
+                QuestionText = request.dto.QuestionText.Trim(),
+                Explanation = request.dto.Explanation?.Trim(),
+                QuizId = request.quizId,
             };
 
-            foreach (var o in dto.Options)
+            foreach (var option in request.dto.Options)
             {
                 question.Options.Add(new Options
                 {
-                    OptionText = o.OptionText,
-                    IsCorrect = o.IsCorrect,
-                    Question = question,
+                    OptionText = option.OptionText.Trim(),
+                    IsCorrect = option.IsCorrect,
                 });
             }
 
-            quiz.Questions.Add(question);
+            await _questionRepository.AddAsync(question);
+            await _questionRepository.SaveChangesAsync();
 
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            return ApiResponse<int>.SuccessResponse(question.Id);
+            return question.Id;
+        }
+
+        private async Task ValidateRequestAsync(CreateQuestionsCommand request, CancellationToken cancellationToken)
+        {
+            var quizExists = await _quizRepository.Query()
+                .AsNoTracking()
+                .AnyAsync(q => q.Id == request.quizId, cancellationToken);
+
+            if (!quizExists)
+            {
+                throw new NotFoundException("Quiz Not Found");
+            }
+
+            ValidateQuestion(request.dto);
+        }
+
+        private static void ValidateQuestion(CreateQuestionsforQuizDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.QuestionText))
+            {
+                throw new ValidationException("Question text is required");
+            }
+
+            if (dto.Options.Count < 2)
+            {
+                throw new ValidationException("Question must have at least 2 options");
+            }
+
+            if (dto.Options.Count(option => option.IsCorrect) != 1)
+            {
+                throw new ValidationException("Exactly one correct option required");
+            }
+
+            if (dto.Options.Any(option => string.IsNullOrWhiteSpace(option.OptionText)))
+            {
+                throw new ValidationException("Option text is required");
+            }
         }
     }
 }

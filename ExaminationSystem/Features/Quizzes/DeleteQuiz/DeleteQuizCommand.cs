@@ -1,9 +1,8 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
-using MediatR;
+﻿using MediatR;
 
 namespace ExaminationSystem.Features.Quizzes.DeleteQuiz
 {
-    public record DeleteQuizCommand(int quizId) : IRequest<ApiResponse<bool>>
+    public record DeleteQuizCommand(int quizId) : IRequest<bool>
     {
     }
 }
