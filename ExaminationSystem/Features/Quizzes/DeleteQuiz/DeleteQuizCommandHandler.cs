@@ -1,32 +1,38 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
-using ExaminationSystem.Infrastructure.Persistence;
+using ExaminationSystem.BuildingBlocks.Exceptions;
+using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Domain.Entities;
 using MediatR;
 
 namespace ExaminationSystem.Features.Quizzes.DeleteQuiz
 {
-    public class DeleteQuizCommandHandler : IRequestHandler<DeleteQuizCommand, ApiResponse<bool>>
+    public class DeleteQuizCommandHandler : IRequestHandler<DeleteQuizCommand, bool>
     {
-        private readonly ExamAppDbContext _dbContext;
+        private readonly IGeneralRepository<Quiz> _repository;
 
-        public DeleteQuizCommandHandler(ExamAppDbContext dbContext)
+        public DeleteQuizCommandHandler(IGeneralRepository<Quiz> repository)
         {
-            _dbContext = dbContext;
+            _repository = repository;
         }
-        public async Task<ApiResponse<bool>> Handle(DeleteQuizCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteQuizCommand request, CancellationToken cancellationToken)
         {
-            var quiz = await _dbContext.Quizzes.FindAsync(request.quizId);
-            if (quiz is null) return ApiResponse<bool>.FailureResponse("Quiz Not Found", "404");
+            var quiz = await _repository.GetByIdAsync(request.quizId);
+            ValidateRequest(quiz);
 
             //if (quiz.Status == Domain.Enums.Status.published) return ApiResponse<bool>.FailureResponse("Can not delete a published quiz");
 
-            quiz.IsDeleted = true;
-            quiz.DeletedAt = DateTime.UtcNow;
+            _repository.Delete(quiz!);
+            await _repository.SaveChangesAsync();
 
-            _dbContext.Quizzes.Update(quiz);
-            await _dbContext.SaveChangesAsync();
+            return true;
 
-            return ApiResponse<bool>.SuccessResponse(true);
+        }
 
+        private static void ValidateRequest(Quiz? quiz)
+        {
+            if (quiz is null)
+            {
+                throw new NotFoundException("Quiz Not Found");
+            }
         }
     }
 }

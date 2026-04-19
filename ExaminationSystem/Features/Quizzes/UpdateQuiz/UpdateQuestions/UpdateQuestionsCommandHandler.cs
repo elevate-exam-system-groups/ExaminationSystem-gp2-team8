@@ -1,62 +1,94 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.Exceptions;
+using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
-using ExaminationSystem.Infrastructure.Persistence;
+using ExaminationSystem.Features.Quizzes.DTOS;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Features.Quizzes.UpdateQuiz.UpdateQuestions
 {
-    public class UpdateQuestionsCommandHandler : IRequestHandler<UpdateQuestionsCommand, ApiResponse<bool>>
+    public class UpdateQuestionsCommandHandler : IRequestHandler<UpdateQuestionsCommand, bool>
     {
-        private readonly ExamAppDbContext _dbContext;
+        private readonly IGeneralRepository<Question> _questionRepository;
+        private readonly IGeneralRepository<Options> _optionRepository;
 
-        public UpdateQuestionsCommandHandler(ExamAppDbContext dbContext)
+        public UpdateQuestionsCommandHandler(
+            IGeneralRepository<Question> questionRepository,
+            IGeneralRepository<Options> optionRepository)
         {
-            _dbContext = dbContext;
+            _questionRepository = questionRepository;
+            _optionRepository = optionRepository;
         }
-        public async Task<ApiResponse<bool>> Handle(UpdateQuestionsCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateQuestionsCommand request, CancellationToken cancellationToken)
         {
-            var question = await _dbContext.Questions
-                .Include(q => q.Options)
-                .FirstOrDefaultAsync(q => q.Id == request.questionId, cancellationToken);
+            await ValidateRequestAsync(request, cancellationToken);
 
-            if (question == null)
-                return ApiResponse<bool>.FailureResponse("Question Not Found", "404");
+            var question = await _questionRepository.GetByIdAsync(request.questionId)
+                ?? throw new NotFoundException("Question Not Found");
 
-            var incomingOptions = request.dto.Options;
+            question.QuestionText = request.dto.QuestionText.Trim();
+            question.Explanation = request.dto.Explanation?.Trim();
 
-            if (string.IsNullOrWhiteSpace(request.dto.QuestionText))
-                return ApiResponse<bool>.FailureResponse("Question text is required", "422");
+            var existingOptions = await _optionRepository.Query()
+                .Where(option => option.QuestionId == question.Id)
+                .ToListAsync(cancellationToken);
 
-
-            question.QuestionText = request.dto.QuestionText;
-            question.Explanation = request.dto.Explanation;
-
-            if (incomingOptions.Count < 2)
-                return ApiResponse<bool>.FailureResponse("At least 2 options required", "422");
-
-            if (incomingOptions.Count(o => o.IsCorrect) != 1)
-                return ApiResponse<bool>.FailureResponse("Exactly one correct option required", "422");
-
-            if (incomingOptions.Any(o => string.IsNullOrWhiteSpace(o.OptionText)))
-                return ApiResponse<bool>.FailureResponse("Option text is required", "422");
-
-            _dbContext.Options.RemoveRange(question.Options.ToList());
-            question.Options.Clear();
-
-            foreach (var optDto in incomingOptions)
+            foreach (var existingOption in existingOptions)
             {
-                question.Options.Add(new Options
+                _optionRepository.Delete(existingOption);
+            }
+
+            foreach (var option in request.dto.Options)
+            {
+                await _optionRepository.AddAsync(new Options
                 {
-                    Question = question,
-                    OptionText = optDto.OptionText,
-                    IsCorrect = optDto.IsCorrect
+                    QuestionId = question.Id,
+                    OptionText = option.OptionText.Trim(),
+                    IsCorrect = option.IsCorrect
                 });
             }
 
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            _questionRepository.Update(question);
+            await _questionRepository.SaveChangesAsync();
 
-            return ApiResponse<bool>.SuccessResponse(true);
+            return true;
+        }
+
+        private async Task ValidateRequestAsync(UpdateQuestionsCommand request, CancellationToken cancellationToken)
+        {
+            var questionExists = await _questionRepository.Query()
+                .AsNoTracking()
+                .AnyAsync(q => q.Id == request.questionId, cancellationToken);
+
+            if (!questionExists)
+            {
+                throw new NotFoundException("Question Not Found");
+            }
+
+            ValidateQuestion(request.dto);
+        }
+
+        private static void ValidateQuestion(CreateQuestionsforQuizDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.QuestionText))
+            {
+                throw new ValidationException("Question text is required");
+            }
+
+            if (dto.Options.Count < 2)
+            {
+                throw new ValidationException("At least 2 options required");
+            }
+
+            if (dto.Options.Count(option => option.IsCorrect) != 1)
+            {
+                throw new ValidationException("Exactly one correct option required");
+            }
+
+            if (dto.Options.Any(option => string.IsNullOrWhiteSpace(option.OptionText)))
+            {
+                throw new ValidationException("Option text is required");
+            }
         }
     }
 }

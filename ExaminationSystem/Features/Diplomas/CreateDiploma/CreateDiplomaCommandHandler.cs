@@ -1,39 +1,47 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.Exceptions;
+using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Features.Diplomas.DTOS;
-using ExaminationSystem.Infrastructure.Persistence;
 using MediatR;
 
 namespace ExaminationSystem.Features.Diplomas.CreateDiploma
 {
-    public class CreateDiplomaCommandHandler : IRequestHandler<CreateDiplomaCommand, ApiResponse<CreateDiplomaDto>>
+    public class CreateDiplomaCommandHandler : IRequestHandler<CreateDiplomaCommand, CreateDiplomaDto>
     {
-        private readonly ExamAppDbContext _dbContext;
+        private readonly IGeneralRepository<Diploma> _repository;
 
-        public CreateDiplomaCommandHandler(ExamAppDbContext dbContext)
+        public CreateDiplomaCommandHandler(IGeneralRepository<Diploma> repository)
         {
-            _dbContext = dbContext;
+            _repository = repository;
         }
-        public async Task<ApiResponse<CreateDiplomaDto>> Handle(CreateDiplomaCommand request, CancellationToken cancellationToken)
+        public async Task<CreateDiplomaDto> Handle(CreateDiplomaCommand request, CancellationToken cancellationToken)
         {
+            ValidateRequest(request);
+
             var diploma = new Diploma
             {
-                Title = request.Title,
-                Description = request.Descreption,
+                Title = request.Title.Trim(),
+                Description = request.Descreption?.Trim(),
                 status = Domain.Enums.Status.Draft,
                 CreatedAt = DateTime.UtcNow,
             };
 
-            _dbContext.Diplomas.Add(diploma);
-            var result = await _dbContext.SaveChangesAsync();
-            if (result > 0 )
-                return ApiResponse<CreateDiplomaDto>.SuccessResponse(new CreateDiplomaDto
-                {
-                    Title = request.Title,
-                    Description = request.Descreption,
-                });
+            await _repository.AddAsync(diploma);
+            await _repository.SaveChangesAsync();
 
-            return ApiResponse<CreateDiplomaDto>.FailureResponse("Error: Can't Create Diploma");
+            return new CreateDiplomaDto
+            {
+                Title = diploma.Title,
+                Description = diploma.Description,
+            };
+        }
+
+        private static void ValidateRequest(CreateDiplomaCommand request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Title))
+            {
+                throw new ValidationException("Diploma title is required");
+            }
         }
     }
 }

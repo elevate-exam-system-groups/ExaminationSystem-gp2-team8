@@ -1,13 +1,11 @@
-﻿using ExaminationSystem.Features.Attempts.GetAttempts;
-using ExaminationSystem.Features.Attempts.GetAttemptDetails;
+﻿using ExaminationSystem.BuildingBlocks.Helpers;
 using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Features.Attempt;
+using ExaminationSystem.Features.Attempts.GetAttemptDetails;
+using ExaminationSystem.Features.Attempts.GetAttempts;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ExaminationSystem.BuildingBlocks.ExceptionHandling;
-using ExaminationSystem.Features.Attempt.DTOS;
-using System.Threading.Tasks;
-using ExaminationSystem.Features.Attempt;
 
 namespace ExaminationSystem.API.Controllers
 {
@@ -32,19 +30,22 @@ namespace ExaminationSystem.API.Controllers
             [FromQuery] int perPage= 20)
         {
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
-            var query = new GetStudentAttemptQuery(studentId, quizId, diplomaId, page, perPage);
-            var history = await _mediator.Send(query);
-
-            if (!history.Data.Any()) return NotFound();
-            return Ok(history);
+            return await ControllerHelper.ExecuteAsync(
+                async () =>
+                {
+                    var query = new GetStudentAttemptQuery(studentId, quizId, diplomaId, page, perPage);
+                    return await _mediator.Send(query);
+                },
+                history => history.Data.Count == 0 ? NotFound() : Ok(history));
         }
 
         [HttpGet("{attemptId:int}")]
         public async Task<IActionResult> GetAttemptDetails(int attemptId)
         {
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
-            var result = await _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId));
-            return Ok(result);
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId)),
+                Ok);
         }
 
 
