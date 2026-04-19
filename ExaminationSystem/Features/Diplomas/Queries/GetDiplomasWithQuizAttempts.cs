@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Features.Attempt.DTOS;
 using ExaminationSystem.Features.Diplomas.DTOS;
@@ -20,7 +20,7 @@ namespace ExaminationSystem.Features.Diplomas.Queries
         }
         public async Task<IEnumerable<DiplomaQuizAttemptsDto>> Handle(GetDiplomasWithQuizAttempts request, CancellationToken cancellationToken)
         {
-            var diplomas = await _repository.GetAll()
+            var diplomas = await _repository.Query()
                            .Where(d => request.DiplomasIds.Contains(d.Id))
                            .Include(d=>d.Quizzes)
                            .ThenInclude(q=>q.Attempts)
@@ -30,7 +30,7 @@ namespace ExaminationSystem.Features.Diplomas.Queries
             {
                 Id = d.Id,
                 Name = d.Title,
-                Description = d.Description,
+                Description = d.Description ?? string.Empty,
                 QuizCount = d.Quizzes.Count,
                 Quizzes = d.Quizzes.Select(q => new QuizAttemptsDto
                 {
