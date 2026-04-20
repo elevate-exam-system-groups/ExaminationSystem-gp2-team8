@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
 using MediatR;
@@ -19,7 +19,7 @@ namespace ExaminationSystem.Features.Enrollments
 
         public async Task<List<int>> Handle(GetStudentDiplomaEnrollment request, CancellationToken cancellationToken)
         {
-            var diplomaIds=await _repository.GetAll()
+            var diplomaIds=await _repository.Query()
                 .Where(e => e.UserId == request.StudentId )
                 .Include(e=>e.Diploma)
                 .Where(e=>e.Diploma.status==Status.published)

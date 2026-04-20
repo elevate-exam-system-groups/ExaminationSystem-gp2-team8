@@ -16,6 +16,7 @@ namespace ExaminationSystem.API.Controllers
         public DiplomasController(IMediator mediator)
         {
             _mediator = mediator;
+
         }
 
         [HttpGet]

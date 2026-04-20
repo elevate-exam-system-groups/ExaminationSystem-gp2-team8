@@ -1,10 +1,13 @@
-﻿using ExaminationSystem.Domain.Enums;
+using ExaminationSystem.Domain.Enums;
 
 namespace ExaminationSystem.Domain.Entities
 {
-    public class Attempts
+    public class Attempts : IBaseEntity
     {
         public int Id { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
         public int QuizId { get; set; }
         public Quiz Quiz { get; set; } = null!;
 

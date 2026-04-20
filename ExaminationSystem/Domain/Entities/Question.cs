@@ -1,8 +1,9 @@
-namespace ExaminationSystem.Domain.Entities
+﻿namespace ExaminationSystem.Domain.Entities
 {
-    public class Question
+    public class Question : IBaseEntity
     {
         public int Id { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public int QuizId { get; set; }
         public Quiz Quiz { get; set; } = null!;
@@ -15,7 +16,7 @@ namespace ExaminationSystem.Domain.Entities
 
         public DateTime? DeletedAt { get; set; }
         public bool IsDeleted { get; set; }//Soft Delete
-
+        //public bool IsCorrect { get; set; }
 
         public int CreatedByUserId { get; set; }
 

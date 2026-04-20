@@ -1,4 +1,5 @@
-﻿using ExaminationSystem.Features.Diplomas.CreateDiploma;
+﻿using ExaminationSystem.BuildingBlocks.Helpers;
+using ExaminationSystem.Features.Diplomas.CreateDiploma;
 using ExaminationSystem.Features.Diplomas.DeleteDiploma;
 using ExaminationSystem.Features.Diplomas.DTOS;
 using ExaminationSystem.Features.Diplomas.UpdateDiploma;
@@ -21,25 +22,25 @@ namespace ExaminationSystem.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateDiploma(string title, string? description)
         {
-            var result = await _mediator.Send(new CreateDiplomaCommand(title, description));
-            if (!result.isSuccess) return StatusCode(400, result.Error);
-            return StatusCode(201, result.Data);
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new CreateDiplomaCommand(title, description)),
+                result => StatusCode(StatusCodes.Status201Created, result));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDiploma(int id, string title, string? description)
         {
-            var result = await _mediator.Send(new UpdateDiplomaCommand(id, title, description));
-            if (!result.isSuccess) return StatusCode(400, result.Error);
-            return StatusCode(201, result.Data);
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new UpdateDiplomaCommand(id, title, description)),
+                result => Ok(result));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDiploma(int id)
         {
-            var result = await _mediator.Send(new DeleteDiplomaCommand(id));
-            if (!result.isSuccess) return StatusCode(400, result.Error);
-            return StatusCode(201, result.Data);
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new DeleteDiplomaCommand(id)),
+                result => Ok(result));
         }
     }
 }

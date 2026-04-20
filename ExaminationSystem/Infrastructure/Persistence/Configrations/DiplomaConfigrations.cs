@@ -1,4 +1,4 @@
-using ExaminationSystem.Domain.Entities;
+﻿using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,6 +22,10 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
             builder.Property(d => d.status)
             .IsRequired()
             .HasConversion<string>();
+
+            builder.Property(d => d.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
 
             builder.Property(d => d.IsDeleted)
                 .HasDefaultValue(false);

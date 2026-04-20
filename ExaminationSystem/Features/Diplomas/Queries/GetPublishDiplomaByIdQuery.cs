@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.ExceptionHandling;
 using ExaminationSystem.BuildingBlocks.Exceptions;
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
@@ -30,17 +30,17 @@ namespace ExaminationSystem.Features.Diplomas.Queries
         {
            
             //wait till student Auth
-            var enrolled = await _mediator.Send(new GetStudentDiplomaEnrollment(_currentUser.UserId));
+            var enrolled = await _mediator.Send(new GetStudentDiplomaEnrollment(_currentUser.UserId), cancellationToken);
             if (!enrolled.Contains(request.id))
             {
                 throw new ForbiddenException("Student not enrolled");
             }
 
-            var diploma = _repository.GetAll()
+            var diploma = await _repository.Query()
             .Include(d => d.Quizzes)
             .ThenInclude(q => q.Attempts)
             .Where(d => d.Id == request.id && d.status == Status.published)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync(cancellationToken);
 
             if (diploma == null)
             {
