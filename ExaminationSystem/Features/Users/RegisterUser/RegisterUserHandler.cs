@@ -10,44 +10,53 @@ namespace ExaminationSystem.Features.Users.RegisterUser
     public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, ApiResponse<RegisterResponseDto>>
     {
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<RegisterUserHandler> _logger;
 
-
-        public RegisterUserHandler(UserManager<User> userManager)
+        public RegisterUserHandler(UserManager<User> userManager, ILogger<RegisterUserHandler> logger)
         {
             _userManager = userManager;
-
+            _logger = logger;
         }
         public async Task<ApiResponse<RegisterResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
-           
-            var existing = await _userManager.FindByEmailAsync(request.userDto.Email);
+            var dto = request.userDto;
+
+            //Check for duplicate email
+            var existing = await _userManager.FindByEmailAsync(dto.Email);
             if (existing is not null)
             {
                 return ApiResponse<RegisterResponseDto>.Fail("An account with this email already exists.");
             }
+
+            // Build the user
             var user = new User()
             {
 
-                FullName = request.userDto.FullName,
-                Email = request.userDto.Email,
-                Status = UserStatus.Pending
+                FullName = dto.FullName.Trim(),
+                Email = dto.Email.Trim().ToLowerInvariant(),
+                UserName = dto.Email.Trim().ToLowerInvariant(),
+                Status = UserStatus.Pending,
+                DeletedAt= DateTime.UtcNow,
+                EmailConfirmed=false
             };
 
-            var result = await _userManager.CreateAsync(user, request.userDto.Password);
+            //Create user — Identity hashes password
+            var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => e.Description).ToList();
-                //_logger.LogWarning("Registration failed for {Email}: {Errors}", request.userDto.Email, errors);
-                return ApiResponse<RegisterResponseDto>.Fail("Registration failed.",errors);
+                _logger.LogWarning("Registration failed for {Email}: {Errors}", dto.Email, errors);
+                return ApiResponse<RegisterResponseDto>.Fail("Registration failed.", errors);
             }
-            // assign user to role
-            
+
+            // assign user to default role student
             await _userManager.AddToRoleAsync(user, "Student");
 
+            _logger.LogInformation("New user registered: {UserId} | {Email}", user.Id, user.Email);
 
             var response = new RegisterResponseDto
             {
-                UserId=user.Id,
+                UserId = user.Id,
                 Email = user.Email!,
                 FullName = user.FullName,
                 Message = "Account created.",

@@ -54,13 +54,6 @@ namespace ExaminationSystem.API.Controllers
             [FromBody] SubmitAnswerRequestDto dto,
             CancellationToken cancellationToken)
         {
-          
-            //Extract user ID from JWT claims 
-            //var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
-            //               ?? User.FindFirstValue("sub");
-
-            //if (!int.TryParse(userIdClaim, out var currentUserId))
-            //    return Unauthorized(ApiResponse<SubmitAnswerResponseDto>.Fail("Invalid token.", statusCode: 401));
 
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
 

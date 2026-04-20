@@ -23,6 +23,7 @@ namespace ExaminationSystem.Domain.Entities
 
         // Authentication //
         public DateTime? DeletedAt { get; set; }
+        
 
     }
 }

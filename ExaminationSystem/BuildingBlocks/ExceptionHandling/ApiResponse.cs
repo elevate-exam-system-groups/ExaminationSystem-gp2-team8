@@ -14,9 +14,9 @@ namespace ExaminationSystem.BuildingBlocks.ExceptionHandling
             => new() { isSuccess = false, Error = new() { Message = message, Code = code, Details = details} };
 
         // Authentication //
-        public bool Success { get; init; }
+       
         public string Message { get; init; } = string.Empty;
-        //public T? Data { get; init; }
+        
         public List<string> Errors { get; init; } = [];
         public int StatusCode { get; init; } = 200;
 
@@ -25,10 +25,10 @@ namespace ExaminationSystem.BuildingBlocks.ExceptionHandling
         public string? RefreshToken { get; init; }
 
         public static ApiResponse<T> Ok(T data, string message = "Success") =>
-            new() { Success = true, Message = message, Data = data, StatusCode = 200 };
+            new() { isSuccess = true, Message = message, Data = data, StatusCode = 200 };
 
         public static ApiResponse<T> Fail(string message, List<string>? errors = null, int statusCode = 400) =>
-            new() { Success = false, Message = message, Errors = errors ?? [], StatusCode = statusCode };
+            new() { isSuccess = false, Message = message, Errors = errors ?? [], StatusCode = statusCode };
 
     }
 

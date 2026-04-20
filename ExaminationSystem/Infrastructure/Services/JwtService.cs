@@ -20,7 +20,7 @@ namespace ExaminationSystem.Infrastructure.Services
             var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured.");
 
             var expiresAt = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiryMinutes"] ?? "15"));
-            // ── Build claims (user_id, role, exp are required per the user story) ──
+            // Build claims (user_id, role, exp) 
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub,user.Id.ToString()),
@@ -28,7 +28,7 @@ namespace ExaminationSystem.Infrastructure.Services
                 new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                 new("full_name",user.FullName),
             };
-            // Add all roles (typically just one: Student or Admin)
+            // Add all roles 
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));

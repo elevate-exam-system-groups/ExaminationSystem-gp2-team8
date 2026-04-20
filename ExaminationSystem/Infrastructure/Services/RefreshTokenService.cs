@@ -15,7 +15,7 @@ namespace ExaminationSystem.Infrastructure.Services
         }
         public async Task<string> CreateRefreshTokenAsync(int userId, string ipAddress, CancellationToken cancellationToken = default)
         {
-            // ── Generate cryptographically secure raw token ────────────────────
+            //Generate cryptographically secure raw token
             var rawToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
             var tokenHash = HashToken(rawToken);
             var refreshToken = new RefreshToken
@@ -28,8 +28,8 @@ namespace ExaminationSystem.Infrastructure.Services
                 CreatedAt = DateTime.UtcNow,
             };
 
-            _context.RefreshTokens.Add(refreshToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            //_context.RefreshTokens.Add(refreshToken);
+            //await _context.SaveChangesAsync(cancellationToken);
 
             // Return raw token — this is the ONLY time it exists in plain text
             return rawToken;
@@ -39,7 +39,7 @@ namespace ExaminationSystem.Infrastructure.Services
         {
             throw new NotImplementedException();
         }
-        // ── Helper ────────────────────────────────────────────────────────────────
+        
         public static string HashToken(string rawToken)
         {
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawToken));

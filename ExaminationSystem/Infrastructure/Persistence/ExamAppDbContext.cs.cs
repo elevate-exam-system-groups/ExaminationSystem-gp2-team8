@@ -74,7 +74,7 @@ namespace ExaminationSystem.Infrastructure.Persistence
         public DbSet<Quiz> Quizzes { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        //public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     }
 }

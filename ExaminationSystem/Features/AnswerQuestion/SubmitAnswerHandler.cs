@@ -64,7 +64,7 @@ namespace ExaminationSystem.Features.AnswerQuestion
             if (question is null)
                 return ApiResponse<SubmitAnswerResponseDto>.Fail($"Question {dto.QuestionId} does not belong to this quiz.",statusCode: 422);
 
-            // Validate selected option belongs to this question 
+            // load selected option belongs to this question 
             var selectedOption = await _db.Options
                 .FirstOrDefaultAsync(o =>
                     o.Id == dto.SelectedOptionId &&
