@@ -5,6 +5,7 @@
         InProgress,
         Submit,
         Passed,
-        Failed
+        Failed,
+        TimeOut
     }
 }
