@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ExaminationSystem.Domain.Entities
 {
-    public class User:IdentityUser<int>
+    public class User:IdentityUser<int>, IBaseEntity
     {
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
         public string FullName { get; set; } = null!;
 
         public string? OtpHash { get; set; }
@@ -20,10 +23,6 @@ namespace ExaminationSystem.Domain.Entities
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public ICollection<Attempts> Attempts { get; set; } = new List<Attempts>();
         public ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();
-
-        // Authentication //
-        public DateTime? DeletedAt { get; set; }
-        
 
     }
 }

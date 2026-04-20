@@ -1,7 +1,8 @@
 using ExaminationSystem.BuildingBlocks.Exceptions;
+using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
 using ExaminationSystem.Features.Attempts.DTOs;
-using ExaminationSystem.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,16 +10,16 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptDetails
 {
     public class GetStudentAttemptDetailsQueryHandler : IRequestHandler<GetStudentAttemptDetailsQuery, AttemptResultDetailDto>
     {
-        private readonly ExamAppDbContext _dbContext;
+        private readonly IGeneralRepository<Domain.Entities.Attempts> _repository;
 
-        public GetStudentAttemptDetailsQueryHandler(ExamAppDbContext dbContext)
+        public GetStudentAttemptDetailsQueryHandler(IGeneralRepository<Domain.Entities.Attempts> repository)
         {
-            _dbContext = dbContext;
+            _repository = repository;
         }
 
         public async Task<AttemptResultDetailDto> Handle(GetStudentAttemptDetailsQuery request, CancellationToken cancellationToken)
         {
-            var attempt = await _dbContext.Attempts
+            var attempt = await _repository.Query()
                 .AsNoTracking()
                 .Include(a => a.Quiz)
                     .ThenInclude(q => q.Questions)

@@ -1,8 +1,11 @@
-﻿namespace ExaminationSystem.Domain.Entities
+namespace ExaminationSystem.Domain.Entities
 {
-    public class StudentAnswer
+    public class StudentAnswer : IBaseEntity
     {
         public int Id { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
         public int UserId { get; set; }
         public User User { get; set; } = null!;
         public int AttemptId { get; set; }

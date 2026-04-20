@@ -2,6 +2,9 @@
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Features.AnswerQuestion;
 using ExaminationSystem.Features.AnswerQuestion.DTOs;
+﻿using ExaminationSystem.BuildingBlocks.Helpers;
+using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Features.Attempt;
 using ExaminationSystem.Features.Attempts.GetAttemptDetails;
 using ExaminationSystem.Features.Attempts.GetAttempts;
 using MediatR;
@@ -33,18 +36,30 @@ namespace ExaminationSystem.API.Controllers
             [FromQuery] int perPage= 20)
         {
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
-            var query = new GetStudentAttemptQuery(studentId, quizId, diplomaId, page, perPage);
-            var history = await _mediator.Send(query);
-
-            if (!history.Data.Any()) return NotFound();
-            return Ok(history);
+            return await ControllerHelper.ExecuteAsync(
+                async () =>
+                {
+                    var query = new GetStudentAttemptQuery(studentId, quizId, diplomaId, page, perPage);
+                    return await _mediator.Send(query);
+                },
+                history => history.Data.Count == 0 ? NotFound() : Ok(history));
         }
 
         [HttpGet("{attemptId:int}")]
         public async Task<IActionResult> GetAttemptDetails(int attemptId)
         {
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
-            var result = await _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId));
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId)),
+                Ok);
+        }
+
+
+        [HttpGet("{attemptid}/results")]
+        public async Task<IActionResult> ViewAttemptsResult(int attemptid)
+        {
+            int studentId = _currentUserService.UserId;
+            var result = await _mediator.Send(new ViewAttemptResults(studentId, attemptid));
             return Ok(result);
         }
 

@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.Domain.Entities;
+using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,7 +9,18 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
         public void Configure(EntityTypeBuilder<Enrollment> builder)
         {
             builder.HasKey(e => e.Id);
-            builder.HasQueryFilter(e => !e.Diploma.IsDeleted);
+
+            builder.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(e => e.IsDeleted)
+                .HasDefaultValue(false);
+
+            builder.Property(e => e.DeletedAt)
+                .IsRequired(false);
+
+            builder.HasQueryFilter(e => !e.IsDeleted && !e.Diploma.IsDeleted && !e.User.IsDeleted);
 
             // Relationships
             builder.HasOne(e => e.User)

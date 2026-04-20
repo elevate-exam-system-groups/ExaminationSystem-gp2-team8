@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.Domain.Entities;
+using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,10 +9,21 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
         public void Configure(EntityTypeBuilder<StudentAnswer> builder)
         {
             builder.HasKey(x => x.Id);
+
+            builder.Property(x => x.IsDeleted)
+                .HasDefaultValue(false);
+
+            builder.Property(x => x.DeletedAt)
+                .IsRequired(false);
+
             builder.HasQueryFilter(x =>
+                !x.IsDeleted &&
+                !x.Attempt.IsDeleted &&
                 !x.Question.IsDeleted &&
                 !x.Question.Quiz.IsDeleted &&
-                !x.Question.Quiz.Diploma.IsDeleted);
+                !x.Question.Quiz.Diploma.IsDeleted &&
+                !x.SelectedOption.IsDeleted &&
+                !x.User.IsDeleted);
 
             builder.HasOne(x => x.User)
                 .WithMany(u => u.StudentAnswers)

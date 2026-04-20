@@ -1,4 +1,4 @@
-using ExaminationSystem.Domain.Entities;
+﻿using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,6 +9,10 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
         public void Configure(EntityTypeBuilder<Quiz> builder)
         {
             builder.HasKey(q => q.Id);
+
+            builder.Property(q => q.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
 
             builder.Property(q => q.IsDeleted)
                 .HasDefaultValue(false);

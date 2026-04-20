@@ -1,7 +1,7 @@
-﻿using ExaminationSystem.BuildingBlocks.Pagination;
+using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Features.Attempts.DTOs;
-using ExaminationSystem.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -10,17 +10,19 @@ namespace ExaminationSystem.Features.Attempts.GetAttempts
 {
     public class GetStudentAttemptQueryHandler : IRequestHandler<GetStudentAttemptQuery, PaginatedResult<QuizHistoryDto>>
     {
-        private readonly ExamAppDbContext _dbContext;
+        private readonly IGeneralRepository<Domain.Entities.Attempts> _repository;
 
-        public GetStudentAttemptQueryHandler(ExamAppDbContext dbContext)
+        public GetStudentAttemptQueryHandler(IGeneralRepository<Domain.Entities.Attempts> repository)
         {
-            _dbContext = dbContext;
+            _repository = repository;
         }
         public async Task<PaginatedResult<QuizHistoryDto>> Handle(GetStudentAttemptQuery request, CancellationToken cancellationToken)
         {
-            var query = _dbContext.Attempts.Where(a => a.UserId == request.StudentId);
+            var query = _repository.Query()
+                .AsNoTracking()
+                .Where(a => a.UserId == request.StudentId && a.Attempt != Domain.Enums.AttemptStatus.InProgress);
 
-            if(request.quizId.HasValue)
+            if (request.quizId.HasValue)
                 query = query.Where(a=> a.QuizId == request.quizId);
 
             if (request.diplomaId.HasValue)
@@ -28,7 +30,7 @@ namespace ExaminationSystem.Features.Attempts.GetAttempts
 
             query = query.OrderByDescending(a => a.SubmittedAt);
 
-            var count = await query.CountAsync();
+            var count = await query.CountAsync(cancellationToken);
 
             var items = await query.Skip((request.page -1) * request.perPage)
                 .Take(request.perPage)
@@ -39,7 +41,7 @@ namespace ExaminationSystem.Features.Attempts.GetAttempts
                     a.Attempt.ToString(),
                     a.score >= a.Quiz.PassScore,
                     a.SubmittedAt
-                    )).ToListAsync();
+                    )).ToListAsync(cancellationToken);
 
             return new PaginatedResult<QuizHistoryDto>(items, count, request.page, request.perPage);
         }
