@@ -15,5 +15,6 @@ namespace ExaminationSystem.Domain.Entities
 
         public UserRole Role { get; set; }
         public UserStatus Status { get; set; }
+
     }
 }

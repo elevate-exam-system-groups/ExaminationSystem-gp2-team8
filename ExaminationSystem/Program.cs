@@ -1,5 +1,7 @@
 using ExaminationSystem.Domain.Contracts;
 using ExaminationSystem.Domain.Entities;
+using ExaminationSystem.Infrastructure.Identity;
+using ExaminationSystem.Infrastructure.Persistence;
 using ExaminationSystem.Infrastructure.Persistence.Data;
 using ExaminationSystem.Infrastructure.Persistence.Repositories;
 using ExaminationSystem.Infrastructure.Persistence.Reposteries;
@@ -18,18 +20,17 @@ namespace ExaminationSystem
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
-            builder.Services.AddMediatR(typeof(Program).Assembly);
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            
             builder.Services.AddDbContext<ExamAppDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
 
-           
+            builder.Services.AddMediatR(typeof(Program).Assembly);
+
             builder.Services.AddIdentity<User, IdentityRole<int>>()
                 .AddEntityFrameworkStores<ExamAppDbContext>()
                 .AddDefaultTokenProviders();
