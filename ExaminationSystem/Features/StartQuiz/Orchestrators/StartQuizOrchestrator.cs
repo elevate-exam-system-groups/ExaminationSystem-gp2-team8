@@ -1,95 +1,96 @@
 ﻿using ExaminationSystem.Domain.Common;
-using ExaminationSystem.Domain.Entities;
-using ExaminationSystem.Domain.Enums;
+using ExaminationSystem.Features.StartQuiz.Orchestrators;
 using ExaminationSystem.Features.StartQuiz.Queries;
-using ExaminationSystem.Infrastructure.Persistence.Data;
+using ExaminationSystem.Features.StartQuiz.DTOS;
+
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using QuizAttemptDto = ExaminationSystem.Features.StartQuiz.DTOS.QuizAttemptDto;
 
-namespace ExaminationSystem.Features.StartQuiz.Commands
+public record StartQuizOrchestrator(int UserId, int QuizId)
+    : IRequest<Result<QuizAttemptDto>>;
+
+public class StartQuizOrchestratorHandler
+    : IRequestHandler<StartQuizOrchestrator, Result<QuizAttemptDto>>
 {
-    public record StartQuizOrchestrator(int quizId, int userId) : IRequest<Result<QuizAttemptDto>>;
+    private readonly IMediator _mediator;
 
-    public class StartQuizOrchestratorHandler: IRequestHandler<StartQuizOrchestrator, Result<QuizAttemptDto>>
+    public StartQuizOrchestratorHandler(IMediator mediator)
     {
-        private readonly IMediator _mediator;
-        private readonly UserManager<User> _userManager;
-        private readonly ExamAppDbContext _dbContext;
+        _mediator = mediator;
+    }
 
-        public StartQuizOrchestratorHandler( IMediator mediator,UserManager<User> userManager,ExamAppDbContext dbContext)
+    public async Task<Result<QuizAttemptDto>> Handle(
+        StartQuizOrchestrator request,
+        CancellationToken cancellationToken)
+    {
+        // 1) Check Quiz Availability
+        var isAvailable = await _mediator.Send(
+            new IsQuizAvailableQuery(request.QuizId),
+            cancellationToken);
+
+        if (!isAvailable)
+            return Result<QuizAttemptDto>.Fail("Quiz not available");
+
+        // 2) Get Quiz
+        var quizResult = await _mediator.Send(
+            new GetQuizByIdQuery(request.QuizId),
+            cancellationToken);
+
+        if (!quizResult.IsSuccess || quizResult.Data is null)
+            return Result<QuizAttemptDto>.Fail("Quiz not found");
+
+        var quiz = quizResult.Data;
+
+        // 3) Get Active User
+        var user = await _mediator.Send(
+            new GetActiveUserQuery(request.UserId),
+            cancellationToken);
+
+        if (user is null)
+            return Result<QuizAttemptDto>.Fail("User not found or inactive");
+
+        // 4) Check Max Attempts
+        var attemptsCheck = await _mediator.Send(
+            new CheckMaxAttemptsOrchestrator(request.UserId, request.QuizId),
+            cancellationToken);
+
+        if (!attemptsCheck.IsSuccess || !attemptsCheck.Data.IsAllowed)
+            return Result<QuizAttemptDto>.Fail(
+                attemptsCheck.Data?.Message ?? "Max attempts reached");
+
+        // 5) Check Active Attempt
+        var activeAttemptResult = await _mediator.Send(
+            new CheckActiveAttemptQuery(request.UserId, request.QuizId),
+            cancellationToken);
+
+        if (!activeAttemptResult.IsSuccess)
+            return Result<QuizAttemptDto>.Fail("Active attempt check failed");
+
+        if (activeAttemptResult.Data)
+            return Result<QuizAttemptDto>.Fail("You already have an active attempt");
+
+        // 6) Create Attempt
+        var attemptResult = await _mediator.Send(
+            new CreateAttemptCommand(request.UserId, request.QuizId, quiz.DurationMinutes),
+            cancellationToken);
+
+        if (!attemptResult.IsSuccess || attemptResult.Data is null)
+            return Result<QuizAttemptDto>.Fail("Failed to create attempt");
+
+        var attempt = attemptResult.Data;
+
+        // 7) Final DTO
+        return Result<QuizAttemptDto>.Success(new QuizAttemptDto
         {
-            _mediator = mediator;
-            _userManager = userManager;
-            _dbContext = dbContext;
-        }
-
-        public async Task<Result<QuizAttemptDto>> Handle(StartQuizOrchestrator request,CancellationToken cancellationToken){
-            // 1. check quiz availability 
-            var isAvailable = await _mediator.Send(new IsQuizAvailableQuery(request.quizId) , cancellationToken);
-
-            if (!isAvailable)
-                return Result<QuizAttemptDto>.Fail("Quiz not available");
-
-            // 2. get quiz details
-            var quiz = await _dbContext.Quizzes.FirstOrDefaultAsync(q => q.Id == request.quizId, cancellationToken);
-
-            if (quiz == null)
-                return Result<QuizAttemptDto>.Fail("Quiz not found");
-
-            // 3. get user
-            var user = await _userManager.FindByIdAsync(request.userId.ToString());
-
-            if (user == null || user.Status != UserStatus.Active)
-                return Result<QuizAttemptDto>.Fail("User not found or inactive");
-
-            // 4. max attempts
-            if (quiz.MaxAttempts.HasValue)
-            {
-                var userAttemptsCount = await _dbContext.Attempts
-                    .CountAsync(a =>a.UserId == request.userId && a.QuizId == request.quizId, cancellationToken);
-
-                if (userAttemptsCount >= quiz.MaxAttempts.Value)
-                    return Result<QuizAttemptDto>.Fail("Max attempts reached");
-            }
-
-            // 5. active attempt
-            var hasActiveAttempt = await _dbContext.Attempts.AnyAsync(a =>
-                    a.UserId == request.userId &&
-                    a.QuizId == request.quizId &&
-                    a.Attempt == AttemptStatus.InProgress, cancellationToken);
-
-            if (hasActiveAttempt)
-                return Result<QuizAttemptDto>.Fail("You already have an active attempt");
-
-            // 6. create attempt
-            var attempt = new Attempts
-            {
-                QuizId = quiz.Id,
-                UserId = user.Id,
-                StartTime = DateTime.UtcNow,
-                Deadline = DateTime.UtcNow.AddMinutes(quiz.DurationMinutes),
-                Attempt = AttemptStatus.InProgress
-            };
-
-            await _dbContext.Attempts.AddAsync(attempt, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            // 7. dto
-            var dto = new QuizAttemptDto
-            {
-                AttemptId = attempt.Id,
-                QuizId = quiz.Id,
-                QuizTitle = quiz.Title,
-                DurationMinutes = quiz.DurationMinutes,
-                Instructions = quiz.Instructions,
-                StartTime = attempt.StartTime,
-                Deadline = attempt.Deadline,
-                Status = attempt.Attempt.ToString()
-            };
-
-            return Result<QuizAttemptDto>.Success(dto, "Quiz started successfully");
-        }
-    }
+            AttemptId = attempt.AttemptId,
+            QuizId = quiz.Id,
+            QuizTitle = quiz.Title,
+            DurationMinutes = quiz.DurationMinutes,
+            Instructions = quiz.Instructions,
+            StartTime = attempt.StartTime,
+            Deadline = attempt.Deadline,
+            Status = attempt.Status
+        });
     }
 
+}

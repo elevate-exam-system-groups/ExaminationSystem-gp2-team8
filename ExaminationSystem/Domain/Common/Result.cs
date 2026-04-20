@@ -11,7 +11,7 @@
             => new Result<T>
             {
                 IsSuccess = true,
-                Message = message,
+                Message = message, 
                 Data = data
             };
 

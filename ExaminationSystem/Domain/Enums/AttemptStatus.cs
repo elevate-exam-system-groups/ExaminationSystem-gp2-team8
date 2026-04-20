@@ -3,6 +3,6 @@
     public enum AttemptStatus
     {
         InProgress,
-        Submit
+        Submitted
     }
 }
