@@ -14,5 +14,8 @@ namespace ExaminationSystem.Domain.Entities
         public Question Question { get; set; } = null!;
         public int SelectedOptionId { get; set; }
         public Options SelectedOption { get; set; } = null!;
+        // for submit answer
+        public bool IsCorrect { get; set; }
+        public DateTime AnsweredAt { get; set; } = DateTime.UtcNow;
     }
 }

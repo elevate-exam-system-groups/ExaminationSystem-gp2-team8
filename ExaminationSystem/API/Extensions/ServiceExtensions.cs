@@ -29,6 +29,7 @@ namespace ExaminationSystem.API.Extensions
 
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            services.AddScoped<IAutoSubmitService, AutoSubmitService>();
             return services;
         }
         /// <summary>Seeds required roles on first run.</summary>
