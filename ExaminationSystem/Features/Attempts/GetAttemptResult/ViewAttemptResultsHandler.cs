@@ -55,6 +55,7 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptResult
                 Questions = attempt.StudentAnswers.Select(s => new QuestionAttemptDTO()
                 {
 
+
                     QuestionId = s.QuestionId,
                     studentAnswer = s.SelectedOption.OptionText,
                     CorrectAnswer = s.Question.Options.FirstOrDefault(o => o.IsCorrect == true)?.OptionText ?? "",
