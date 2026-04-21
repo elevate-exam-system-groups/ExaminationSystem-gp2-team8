@@ -26,6 +26,12 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
                 .IsRequired(false);
 
             builder.HasQueryFilter(user => !user.IsDeleted);
+
+
+
+            builder.HasDiscriminator<string>("UserType")
+            .HasValue<Student>("Student")
+            .HasValue<Admin>("Admin");
         }
     }
 }

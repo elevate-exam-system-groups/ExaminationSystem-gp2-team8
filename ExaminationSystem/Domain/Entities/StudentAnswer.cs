@@ -7,7 +7,7 @@ namespace ExaminationSystem.Domain.Entities
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public Student User { get; set; } = null!;
         public int AttemptId { get; set; }
         public Attempts Attempt { get; set; } = null!;
         public int QuestionId { get; set; }

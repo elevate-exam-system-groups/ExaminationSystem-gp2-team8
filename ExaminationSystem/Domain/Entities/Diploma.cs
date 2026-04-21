@@ -15,7 +15,7 @@ namespace ExaminationSystem.Domain.Entities
 
         public bool IsDeleted { get; set; }//Soft Delete
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public User CreatedByUser { get; set; } = null!;
+        public Admin CreatedByUser { get; set; } = null!;
         public int CreatedByUserId { get; set; }//FK
         public ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
