@@ -3,6 +3,7 @@ using ExaminationSystem.Infrastructure.Identity;
 using ExaminationSystem.Infrastructure.Persistence;
 using ExaminationSystem.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ExaminationSystem.API.Extensions
 {
@@ -18,7 +19,7 @@ namespace ExaminationSystem.API.Extensions
                 o.Password.RequiredLength = 8;
                 o.User.RequireUniqueEmail = true;
 
-            }).AddEntityFrameworkStores<IdentityStoreDbContext>()
+            }).AddEntityFrameworkStores<IdentityDbContext<User, IdentityRole<int>, int>>()
             .AddRoles<IdentityRole<int>>()
             .AddDefaultTokenProviders();
 
