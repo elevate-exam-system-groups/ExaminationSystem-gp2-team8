@@ -1,4 +1,7 @@
-﻿using ExaminationSystem.BuildingBlocks.Helpers;
+using ExaminationSystem.BuildingBlocks.Helpers;
+using ExaminationSystem.Features.Diplomas.CreateDiploma;
+using ExaminationSystem.Features.Diplomas.DeleteDiploma;
+using ExaminationSystem.Features.Diplomas.UpdateDiploma;
 using ExaminationSystem.Features.Quizzes.CreateQuiz;
 using ExaminationSystem.Features.Quizzes.CreateQuiz.CreateQuestions;
 using ExaminationSystem.Features.Quizzes.DeleteQuiz;
@@ -14,13 +17,37 @@ namespace ExaminationSystem.API.Controllers
 {
     [Route("api/admin")]
     [ApiController]
-    public class AdminQuizzesController : ControllerBase
+    public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public AdminQuizzesController(IMediator mediator)
+        public AdminController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpPost("diplomas")]
+        public async Task<IActionResult> CreateDiploma(string title, string? description)
+        {
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new CreateDiplomaCommand(title, description)),
+                result => StatusCode(StatusCodes.Status201Created, result));
+        }
+
+        [HttpPut("diplomas/{id:int}")]
+        public async Task<IActionResult> UpdateDiploma(int id, string title, string? description)
+        {
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new UpdateDiplomaCommand(id, title, description)),
+                result => Ok(result));
+        }
+
+        [HttpDelete("diplomas/{id:int}")]
+        public async Task<IActionResult> DeleteDiploma(int id)
+        {
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new DeleteDiplomaCommand(id)),
+                result => Ok(result));
         }
 
         [HttpPost("quizzes")]
