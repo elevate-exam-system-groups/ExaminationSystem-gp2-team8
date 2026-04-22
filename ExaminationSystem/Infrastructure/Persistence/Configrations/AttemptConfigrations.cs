@@ -17,10 +17,10 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
                 .IsRequired(false);
 
             builder.HasQueryFilter(a =>
-    !a.IsDeleted &&
-    !a.Quiz.IsDeleted &&
-    !a.Quiz.Diploma.IsDeleted &&
-    !a.User.IsDeleted);
+                    !a.IsDeleted &&
+                    !a.Quiz.IsDeleted &&
+                    !a.Quiz.Diploma.IsDeleted &&
+                    !a.User.IsDeleted);
 
             builder.HasOne(a => a.Quiz)
                 .WithMany(q => q.Attempts)
