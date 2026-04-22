@@ -3,8 +3,8 @@ using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Features.AnswerQuestion;
 using ExaminationSystem.Features.AnswerQuestion.DTOs;
 ﻿using ExaminationSystem.BuildingBlocks.Helpers;
-using ExaminationSystem.BuildingBlocks.Interfaces;
-using ExaminationSystem.Features.Attempt;
+//using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Features.Attempts;
 using ExaminationSystem.Features.Attempts.GetAttemptDetails;
 using ExaminationSystem.Features.Attempts.GetAttempts;
 using MediatR;
@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using ExaminationSystem.Features.Attempts.GetAttemptResult;
 
 namespace ExaminationSystem.API.Controllers
 {

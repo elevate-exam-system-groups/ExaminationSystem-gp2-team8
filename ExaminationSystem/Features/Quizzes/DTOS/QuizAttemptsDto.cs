@@ -1,4 +1,5 @@
-﻿using ExaminationSystem.Features.Attempt.DTOS;
+﻿using ExaminationSystem.Features.Attempts.DTOs;
+
 
 namespace ExaminationSystem.Features.Quizzes.DTOS
 {
