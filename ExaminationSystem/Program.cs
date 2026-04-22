@@ -2,11 +2,13 @@
 using ExaminationSystem.API.Extensions;
 using ExaminationSystem.API.Middlewares;
 using ExaminationSystem.BuildingBlocks.Interfaces;
-using ExaminationSystem.Features.Diplomas.Queries;
+using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Infrastructure.Identity;
 using ExaminationSystem.Infrastructure.Persistence;
 using ExaminationSystem.Infrastructure.Persistence.Repositories;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -31,11 +33,11 @@ namespace ExaminationSystem
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
-            //builder.Services.AddDbContext<IdentityStoreDbContext>(options =>
-            //    options.UseSqlServer(
-            //        builder.Configuration.GetConnectionString("DefaultConnection")
-            //    )
-            //);
+            builder.Services.AddDbContext<IdentityDbContext<User, IdentityRole<int>, int>>(options =>
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection")
+                )
+            );
             builder.Services.AddAuthentication();
             builder.Services.ConfigureIdentity();
             builder.Services.AddInfrastructureServices();
