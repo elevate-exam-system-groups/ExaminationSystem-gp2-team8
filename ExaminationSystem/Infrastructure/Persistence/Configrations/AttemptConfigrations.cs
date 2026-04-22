@@ -16,7 +16,11 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
             builder.Property(a => a.DeletedAt)
                 .IsRequired(false);
 
-            builder.HasQueryFilter(a => !a.IsDeleted);
+            builder.HasQueryFilter(a =>
+    !a.IsDeleted &&
+    !a.Quiz.IsDeleted &&
+    !a.Quiz.Diploma.IsDeleted &&
+    !a.User.IsDeleted);
 
             builder.HasOne(a => a.Quiz)
                 .WithMany(q => q.Attempts)
