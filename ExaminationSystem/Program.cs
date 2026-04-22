@@ -1,5 +1,4 @@
-
-using ExaminationSystem.API.Extensions;
+﻿using ExaminationSystem.API.Extensions;
 using ExaminationSystem.API.Middlewares;
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
@@ -8,9 +7,8 @@ using ExaminationSystem.Infrastructure.Persistence;
 using ExaminationSystem.Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
+using System.Text.Json.Serialization;
 
 namespace ExaminationSystem
 {
@@ -20,50 +18,46 @@ namespace ExaminationSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddControllers()
+                .AddJsonOptions(x =>
+                {
+                    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                });
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-
             builder.Services.AddDbContext<ExamAppDbContext>(options =>
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection")
-                )
-            );
-            builder.Services.AddDbContext<IdentityDbContext<User, IdentityRole<int>, int>>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection")
-                )
-            );
-            builder.Services.AddAuthentication();
-            builder.Services.ConfigureIdentity();
+                    builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddIdentity<User, IdentityRole<int>>()
+                .AddEntityFrameworkStores<ExamAppDbContext>()
+                .AddDefaultTokenProviders();
+
             builder.Services.AddInfrastructureServices();
 
             builder.Services.AddMediatR(typeof(Program).Assembly);
-            builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
+
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped(typeof(IGeneralRepository<>), typeof(GeneralRepository<>));
 
-
             var app = builder.Build();
 
-            await app.SeedRolesAsync();
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            app.UseMiddleware<CustomMiddleWareHandler>();
-            app.UseHttpsRedirection();
 
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.MapControllers();
+
+            await app.SeedRolesAsync();
 
             app.Run();
         }
