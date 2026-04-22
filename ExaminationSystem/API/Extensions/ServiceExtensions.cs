@@ -18,7 +18,7 @@ namespace ExaminationSystem.API.Extensions
                 o.Password.RequiredLength = 8;
                 o.User.RequireUniqueEmail = true;
 
-            }).AddEntityFrameworkStores<IdentityStoreDbContext>()
+            }).AddEntityFrameworkStores<ExamAppDbContext>()
             .AddRoles<IdentityRole<int>>()
             .AddDefaultTokenProviders();
 
@@ -39,6 +39,7 @@ namespace ExaminationSystem.API.Extensions
 
             var roleManager = scope.ServiceProvider
                 .GetRequiredService<RoleManager<IdentityRole<int>>>();  // ← int key
+
 
             string[] roles = ["Student", "Admin"];
 

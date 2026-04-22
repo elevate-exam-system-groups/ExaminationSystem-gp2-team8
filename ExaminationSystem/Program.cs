@@ -31,11 +31,11 @@ namespace ExaminationSystem
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
-            builder.Services.AddDbContext<IdentityStoreDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection")
-                )
-            );
+            //builder.Services.AddDbContext<IdentityStoreDbContext>(options =>
+            //    options.UseSqlServer(
+            //        builder.Configuration.GetConnectionString("DefaultConnection")
+            //    )
+            //);
             builder.Services.AddAuthentication();
             builder.Services.ConfigureIdentity();
             builder.Services.AddInfrastructureServices();

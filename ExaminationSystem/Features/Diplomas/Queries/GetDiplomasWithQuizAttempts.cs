@@ -1,6 +1,6 @@
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
-using ExaminationSystem.Features.Attempt.DTOS;
+using ExaminationSystem.Features.Attempts.DTOs;
 using ExaminationSystem.Features.Diplomas.DTOS;
 using ExaminationSystem.Features.Quizzes.DTOS;
 using MediatR;
