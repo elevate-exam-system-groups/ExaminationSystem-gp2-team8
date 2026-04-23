@@ -17,7 +17,7 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin
         }
         public Task<AttemptAdminSummaryDTO?> Handle(GetDetailsAttemptByIdForAdminQuery request, CancellationToken cancellationToken)
         {
-            var query = _repository.Query().Where(a => a.Id == request.Id)
+            var attempt = _repository.Query().Where(a => a.Id == request.Id)
                 .Select(a => new AttemptAdminSummaryDTO
                 {
                     attemptedId = a.Id,
@@ -30,23 +30,19 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin
                     {
                         QuestionId = sa.QuestionId,
                         QuestionText = sa.Question.QuestionText,
-
                         SelectedOptionId = sa.SelectedOptionId,
                         SelectedOptionText = sa.SelectedOption.OptionText,
-
-                        //CorrectAnswer = sa.Question.,
                         IsCorrect = sa.IsCorrect
                     }).ToList()
 
-                    // Map properties from the Attempts entity to the AttemptAdminSummaryDTO
                 }).FirstOrDefaultAsync();
 
-            if(query == null)
+            if(attempt == null)
             {
                 throw new NotFoundException($"Attempt with ID {request.Id} not found.");
             }
 
-            return query;
+            return attempt;
         }
     }
 }
