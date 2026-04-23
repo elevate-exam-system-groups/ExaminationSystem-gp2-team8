@@ -27,6 +27,7 @@ namespace ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin
                               score=a.score,
                               status=a.Attempt.ToString(),
                               submittedAt=a.SubmittedAt,
+                              
                           });
 
             
