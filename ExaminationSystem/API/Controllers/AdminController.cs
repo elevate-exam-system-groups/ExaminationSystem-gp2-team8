@@ -10,7 +10,6 @@ using ExaminationSystem.Features.Quizzes.DTOS;
 using ExaminationSystem.Features.Quizzes.UpdateQuiz;
 using ExaminationSystem.Features.Quizzes.UpdateQuiz.UpdateQuestions;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExaminationSystem.API.Controllers
