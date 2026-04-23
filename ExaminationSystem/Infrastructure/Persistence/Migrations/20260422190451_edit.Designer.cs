@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ExamAppDbContext))]
-    [Migration("20260415115318_addrefreshtoken")]
-    partial class addrefreshtoken
+    [Migration("20260422190451_edit")]
+    partial class edit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,10 +36,30 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                     b.Property<int>("Attempt")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CorrectCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("Deadline")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool?>("Passed")
+                        .HasColumnType("bit");
+
                     b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ScorePct")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -47,6 +67,9 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime>("SubmittedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("TotalQuestions")
+                        .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -72,7 +95,9 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<int>("CreatedByUserId")
                         .HasColumnType("int");
@@ -116,6 +141,14 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("DiplomaId")
                         .HasColumnType("int");
 
@@ -123,6 +156,11 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -145,8 +183,19 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("OptionText")
                         .IsRequired()
@@ -169,6 +218,9 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("CreatedByUserId")
                         .HasColumnType("int");
@@ -210,6 +262,9 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("CreatedByUserId")
                         .HasColumnType("int");
@@ -300,8 +355,25 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("AnsweredAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("AttemptId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
@@ -340,6 +412,11 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
@@ -354,6 +431,11 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -401,6 +483,11 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -412,6 +499,10 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasDiscriminator<string>("UserType").HasValue("User");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -547,6 +638,20 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ExaminationSystem.Domain.Entities.Admin", b =>
+                {
+                    b.HasBaseType("ExaminationSystem.Domain.Entities.User");
+
+                    b.HasDiscriminator().HasValue("Admin");
+                });
+
+            modelBuilder.Entity("ExaminationSystem.Domain.Entities.Student", b =>
+                {
+                    b.HasBaseType("ExaminationSystem.Domain.Entities.User");
+
+                    b.HasDiscriminator().HasValue("Student");
+                });
+
             modelBuilder.Entity("ExaminationSystem.Domain.Entities.Attempts", b =>
                 {
                     b.HasOne("ExaminationSystem.Domain.Entities.Quiz", "Quiz")
@@ -555,7 +660,7 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Domain.Entities.User", "User")
+                    b.HasOne("ExaminationSystem.Domain.Entities.Student", "User")
                         .WithMany("Attempts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -568,7 +673,7 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("ExaminationSystem.Domain.Entities.Diploma", b =>
                 {
-                    b.HasOne("ExaminationSystem.Domain.Entities.User", "CreatedByUser")
+                    b.HasOne("ExaminationSystem.Domain.Entities.Admin", "CreatedByUser")
                         .WithMany("CreatedDiplomas")
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -585,7 +690,7 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Domain.Entities.User", "User")
+                    b.HasOne("ExaminationSystem.Domain.Entities.Student", "User")
                         .WithMany("Enrollments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -609,7 +714,7 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("ExaminationSystem.Domain.Entities.Question", b =>
                 {
-                    b.HasOne("ExaminationSystem.Domain.Entities.User", "CreatedByUser")
+                    b.HasOne("ExaminationSystem.Domain.Entities.Admin", "CreatedByUser")
                         .WithMany("CreatedQuestions")
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -628,7 +733,7 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("ExaminationSystem.Domain.Entities.Quiz", b =>
                 {
-                    b.HasOne("ExaminationSystem.Domain.Entities.User", "CreatedByUser")
+                    b.HasOne("ExaminationSystem.Domain.Entities.Admin", "CreatedByUser")
                         .WithMany("CreatedQuizzes")
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -676,7 +781,7 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Domain.Entities.User", "User")
+                    b.HasOne("ExaminationSystem.Domain.Entities.Student", "User")
                         .WithMany("StudentAnswers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -773,15 +878,18 @@ namespace ExaminationSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Questions");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Domain.Entities.User", b =>
+            modelBuilder.Entity("ExaminationSystem.Domain.Entities.Admin", b =>
                 {
-                    b.Navigation("Attempts");
-
                     b.Navigation("CreatedDiplomas");
 
                     b.Navigation("CreatedQuestions");
 
                     b.Navigation("CreatedQuizzes");
+                });
+
+            modelBuilder.Entity("ExaminationSystem.Domain.Entities.Student", b =>
+                {
+                    b.Navigation("Attempts");
 
                     b.Navigation("Enrollments");
 

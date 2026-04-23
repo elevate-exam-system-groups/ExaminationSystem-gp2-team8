@@ -1,4 +1,5 @@
 using ExaminationSystem.BuildingBlocks.Helpers;
+using ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin;
 using ExaminationSystem.Features.Diplomas.CreateDiploma;
 using ExaminationSystem.Features.Diplomas.DeleteDiploma;
 using ExaminationSystem.Features.Diplomas.UpdateDiploma;
@@ -95,6 +96,13 @@ namespace ExaminationSystem.API.Controllers
             return await ControllerHelper.ExecuteAsync(
                 () => _mediator.Send(new DeleteQuestionCommand(questionId)),
                 result => Ok(result));
+        }
+
+        [HttpGet("attempts")]
+        public async Task<IActionResult> GetAllAttemptsForAdmin([FromQuery] int pageIndex, [FromQuery] int pageSize)
+        {
+            var result = await _mediator.Send(new ViewStudentAttemptsForAdmin(pageIndex, pageSize));
+            return Ok(result);
         }
     }
 }
