@@ -35,6 +35,8 @@ namespace ExaminationSystem
                 .AddEntityFrameworkStores<ExamAppDbContext>()
                 .AddDefaultTokenProviders();
 
+
+
             builder.Services.AddInfrastructureServices();
 
             builder.Services.AddMediatR(typeof(Program).Assembly);
@@ -42,8 +44,12 @@ namespace ExaminationSystem
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped(typeof(IGeneralRepository<>), typeof(GeneralRepository<>));
-
+            builder.Services.AddScoped<IDataseeding, Dataseeding>();
             var app = builder.Build();
+
+            //using var scope = app.Services.CreateScope();
+            //var seeder = scope.ServiceProvider.GetRequiredService<IDataseeding>();
+            //await seeder.SeedDataAsync();
 
             if (app.Environment.IsDevelopment())
             {

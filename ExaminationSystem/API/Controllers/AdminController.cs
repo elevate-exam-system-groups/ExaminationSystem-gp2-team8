@@ -1,5 +1,8 @@
 using ExaminationSystem.BuildingBlocks.Helpers;
+using ExaminationSystem.BuildingBlocks.Pagination;
+using ExaminationSystem.Features.Attempts.DTOs;
 using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
+using ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId;
 using ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin;
 using ExaminationSystem.Features.Diplomas.CreateDiploma;
 using ExaminationSystem.Features.Diplomas.DeleteDiploma;
@@ -100,17 +103,24 @@ namespace ExaminationSystem.API.Controllers
         }
 
         [HttpGet("attempts")]
-        public async Task<IActionResult> GetAllAttemptsForAdmin([FromQuery] int pageIndex, [FromQuery] int pageSize)
+        public async Task<ActionResult<PaginatedResult<AllAttemptForAdminDTO>>> GetAllAttemptsForAdmin([FromQuery] PaginationParams pagination)
         {
-            var result = await _mediator.Send(new ViewStudentAttemptsForAdmin(pageIndex, pageSize));
+            var result = await _mediator.Send(new ViewStudentAttemptsForAdmin(pagination.Page, pagination.PerPage));
             return Ok(result);
         }
 
 
         [HttpGet("attempts/{id}")]
-        public async Task<IActionResult> GetAttemptByIdForAdmin(int id)
+        public async Task<ActionResult<AttemptAdminSummaryDTO?>> GetAttemptByIdForAdmin(int id)
         {
             var result = await _mediator.Send(new GetDetailsAttemptByIdForAdminQuery(id));
+            return Ok(result);
+        }
+
+        [HttpGet("attempts/{quizId:int}/{studentId:int}")]
+        public async Task<IActionResult> GetAttemptsByQuizIdandStudentIdForAdmin(int quizId,int studentId, [FromQuery] PaginationParams pagination)
+        {
+            var result = await _mediator.Send(new GetStudentByQuizIdandStudntIdQuery(pagination, studentId, quizId));
             return Ok(result);
         }
     }

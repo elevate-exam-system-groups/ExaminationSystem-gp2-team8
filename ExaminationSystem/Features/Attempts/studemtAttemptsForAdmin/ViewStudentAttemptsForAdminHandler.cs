@@ -1,5 +1,4 @@
-﻿using ExaminationSystem.API.Extensions;
-using ExaminationSystem.BuildingBlocks.Interfaces;
+﻿using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Features.Attempts.DTOs;
@@ -19,12 +18,14 @@ namespace ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin
         public async Task<PaginatedResult<AllAttemptForAdminDTO>> Handle(ViewStudentAttemptsForAdmin request, CancellationToken cancellationToken)
         {
             var query = _repository.Query()
+                .AsNoTracking()
+                .IgnoreQueryFilters()
                           .Select(a => new AllAttemptForAdminDTO()
                           {
                               attemptedId=a.Id,
-                              studentId=a.User.Id,
-                              quiztitle=a.Quiz.Title,
-                              score=a.score,
+                              studentId = a.UserId,
+                              quiztitle = a.Quiz.Title,
+                              score =a.score,
                               status=a.Attempt.ToString(),
                               submittedAt=a.SubmittedAt,
                               

@@ -15,17 +15,22 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin
         {
             _repository = repository;
         }
-        public Task<AttemptAdminSummaryDTO?> Handle(GetDetailsAttemptByIdForAdminQuery request, CancellationToken cancellationToken)
+        public async Task<AttemptAdminSummaryDTO?> Handle(
+            GetDetailsAttemptByIdForAdminQuery request,
+            CancellationToken cancellationToken)
         {
-            var attempt = _repository.Query().Where(a => a.Id == request.Id)
+            var attempt = await _repository.Query()
+                .AsNoTracking().IgnoreQueryFilters()
+                .Where(a => a.Id == request.Id )
                 .Select(a => new AttemptAdminSummaryDTO
                 {
                     attemptedId = a.Id,
-                    studentId = a.User.Id,
+                    studentId = a.UserId,
                     quiztitle = a.Quiz.Title,
                     score = a.score,
                     status = a.Attempt.ToString(),
                     submittedAt = a.SubmittedAt,
+
                     Questions = a.StudentAnswers.Select(sa => new QuestionAttemptDTO
                     {
                         QuestionId = sa.QuestionId,
@@ -34,13 +39,11 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin
                         SelectedOptionText = sa.SelectedOption.OptionText,
                         IsCorrect = sa.IsCorrect
                     }).ToList()
+                })
+                .FirstOrDefaultAsync(cancellationToken);
 
-                }).FirstOrDefaultAsync();
-
-            if(attempt == null)
-            {
+            if (attempt == null)
                 throw new NotFoundException($"Attempt with ID {request.Id} not found.");
-            }
 
             return attempt;
         }

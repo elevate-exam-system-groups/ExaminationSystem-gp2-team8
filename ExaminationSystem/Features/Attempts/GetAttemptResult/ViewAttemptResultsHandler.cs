@@ -52,17 +52,14 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptResult
                 TotalQuestions = questionsCount,
                 CorrectCount = correctCount,
                 // i wanna get list of questions for this attempt
-                Questions = attempt.StudentAnswers.Select(s => new QuestionAttemptDTO()
+                Questions = attempt.StudentAnswers.Select(s => new QuestionAttemptsDTO()
                 {
-
-
                     QuestionId = s.QuestionId,
-                    studentAnswer = s.SelectedOption.OptionText,
+                    SelectedAnswer = s.SelectedOption.OptionText,
                     CorrectAnswer = s.Question.Options.FirstOrDefault(o => o.IsCorrect == true)?.OptionText ?? "",
                     IsCorrect = s.SelectedOption.IsCorrect
 
                 }).ToList()
-
             };
 
             return ApiResponse<ViewResultDTO>.SuccessResponse(attemptDto);
