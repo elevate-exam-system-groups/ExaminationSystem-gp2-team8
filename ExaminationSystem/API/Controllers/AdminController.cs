@@ -3,6 +3,7 @@ using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Features.Attempts.DTOs;
 using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
 using ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId;
+using ExaminationSystem.Features.Attempts.Orchestrators;
 using ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin;
 using ExaminationSystem.Features.Diplomas.CreateDiploma;
 using ExaminationSystem.Features.Diplomas.DeleteDiploma;
@@ -113,9 +114,9 @@ namespace ExaminationSystem.API.Controllers
 
 
         [HttpGet("attempts/{id}")]
-        public async Task<ActionResult<AttemptAdminSummaryDTO?>> GetAttemptByIdForAdmin(int id)
+        public async Task<ActionResult<AttemptForAdminDetailsDTO>> GetAttemptByIdForAdmin(int id)
         {
-            var result = await _mediator.Send(new GetDetailsAttemptByIdForAdminQuery(id));
+            var result = await _mediator.Send(new GetAttemptAdminDetailsByIdOrchestrator(id));
             return Ok(result);
         }
 

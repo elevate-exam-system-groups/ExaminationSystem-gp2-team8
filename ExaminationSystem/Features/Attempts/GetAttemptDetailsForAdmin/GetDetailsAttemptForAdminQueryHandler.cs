@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin
 {
-    public class GetDetailsAttemptForAdminQueryHandler : IRequestHandler<GetDetailsAttemptByIdForAdminQuery, AttemptAdminSummaryDTO?>
+    public class GetDetailsAttemptForAdminQueryHandler : IRequestHandler<GetDetailsAttemptByIdForAdminQuery, AttemptSummaryDTO?>
     {
         private readonly IGeneralRepository<Domain.Entities.Attempts> _repository;
 
@@ -15,37 +15,24 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin
         {
             _repository = repository;
         }
-        public async Task<AttemptAdminSummaryDTO?> Handle(
+        public async Task<AttemptSummaryDTO?> Handle(
             GetDetailsAttemptByIdForAdminQuery request,
             CancellationToken cancellationToken)
         {
-            var attempt = await _repository.Query()
-                .AsNoTracking()
-                .Where(a => a.Id == request.Id )
-                .Select(a => new AttemptAdminSummaryDTO
-                {
-                    attemptedId = a.Id,
-                    studentId = a.UserId,
-                    quiztitle = a.Quiz.Title,
-                    score = a.score,
-                    status = a.Attempt.ToString(),
-                    submittedAt = a.SubmittedAt,
-
-                    Questions = a.StudentAnswers.Select(sa => new QuestionAttemptDTO
-                    {
-                        QuestionId = sa.QuestionId,
-                        QuestionText = sa.Question.QuestionText,
-                        SelectedOptionId = sa.SelectedOptionId,
-                        SelectedOptionText = sa.SelectedOption.OptionText,
-                        IsCorrect = sa.IsCorrect
-                    }).ToList()
-                })
-                .FirstOrDefaultAsync(cancellationToken);
+            var attempt = await _repository.GetByIdAsync(request.Id);
 
             if (attempt == null)
                 throw new NotFoundException($"Attempt with ID {request.Id} not found.");
 
-            return attempt;
+            return new AttemptSummaryDTO
+            {
+                attemptedId = attempt.Id,
+                studentId = attempt.UserId,
+                QuizId = attempt.QuizId,
+                submittedAt= attempt.SubmittedAt,
+                status= attempt.Attempt.ToString(),
+                score= attempt.score
+            };
         }
     }
 }

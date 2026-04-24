@@ -22,7 +22,6 @@ namespace ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId
         {
 
             var attempts = _repository.Query()
-                //.IgnoreQueryFilters()
                 .Where(a => a.QuizId == request.quizId && a.UserId == request.studentId)
                             .AsNoTracking().Select(a => new FilteredAttemptsDTO()
                             {
