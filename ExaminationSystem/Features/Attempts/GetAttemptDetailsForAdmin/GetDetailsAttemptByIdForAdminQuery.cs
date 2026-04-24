@@ -3,6 +3,6 @@ using MediatR;
 
 namespace ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin
 {
-    public record GetDetailsAttemptByIdForAdminQuery(int Id) : IRequest<AttemptAdminSummaryDTO?>;
+    public record GetDetailsAttemptByIdForAdminQuery(int Id) : IRequest<AttemptSummaryDTO?>;
    
 }

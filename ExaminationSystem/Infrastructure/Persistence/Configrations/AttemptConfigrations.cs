@@ -17,7 +17,7 @@ namespace ExaminationSystem.Infrastructure.Persistence.Configrations
                 .IsRequired(false);
 
             builder.HasQueryFilter(a =>
-                    !a.IsDeleted &&
+                    !a.IsDeleted&&
                     !a.Quiz.IsDeleted &&
                     !a.Quiz.Diploma.IsDeleted &&
                     !a.User.IsDeleted);

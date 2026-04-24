@@ -7,6 +7,6 @@
         public int TotalQuestions { get; set; }
         public int CorrectCount { get; set; }
         //per Question
-        public ICollection<QuestionAttemptDTO> Questions { get; set; } = [];
+        public ICollection<QuestionAttemptsDTO> Questions { get; set; } = [];
     }
 }
