@@ -15,10 +15,12 @@ using ExaminationSystem.Features.Quizzes.DTOS;
 using ExaminationSystem.Features.Quizzes.UpdateQuiz;
 using ExaminationSystem.Features.Quizzes.UpdateQuiz.UpdateQuestions;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExaminationSystem.API.Controllers
 {
+    //[Authorize(Roles = "Admin")]
     [Route("api/admin")]
     [ApiController]
     public class AdminController : ControllerBase
@@ -118,9 +120,9 @@ namespace ExaminationSystem.API.Controllers
         }
 
         [HttpGet("attempts/{quizId:int}/{studentId:int}")]
-        public async Task<IActionResult> GetAttemptsByQuizIdandStudentIdForAdmin(int quizId,int studentId, [FromQuery] PaginationParams pagination)
+        public async Task<ActionResult<PaginatedResult<FilteredAttemptsDTO>>> GetAttemptsByQuizIdandStudentIdForAdmin(int quizId,int studentId, [FromQuery] PaginationParams pagination)
         {
-            var result = await _mediator.Send(new GetStudentByQuizIdandStudntIdQuery(pagination, studentId, quizId));
+            var result = await _mediator.Send(new GetStudentByQuizIdandStudntIdQuery(pagination, quizId, studentId));
             return Ok(result);
         }
     }

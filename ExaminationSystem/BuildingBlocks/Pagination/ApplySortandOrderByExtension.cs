@@ -6,35 +6,21 @@ namespace ExaminationSystem.BuildingBlocks.Pagination
     {
         public static IQueryable<T> ApplySortandOrderBy<T>(this IQueryable<T> query, string sortBy, string orderBy)
         {
-            if (string.IsNullOrEmpty(sortBy))
-            {
+            if (string.IsNullOrWhiteSpace(sortBy))
                 return query;
-            }
-            //sortby 
 
-            //what i will sort by is a string and
-            //i want to sort by it so i will get the property of the type T
-            //that has the name of sortBy and then i will use it to sort the query
+            var property = typeof(T).GetProperty(
+                sortBy,
+                System.Reflection.BindingFlags.IgnoreCase |
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.Instance);
 
-            //property
-            //so i get the property of the type T that has the name of sortBy
-            var sortByProperty = typeof(T).GetProperty(sortBy);
-            if (sortByProperty != null)
-            {
-                if (orderBy?.ToLower() == "desc")
-                {
-                    //orderByDes(x=>x.name)
-                    query = query.OrderByDescending(x => EF.Property<object>(x, sortByProperty.Name));
-                }
-                else
-                {
-                    query = query.OrderBy(x => EF.Property<object>(x, sortByProperty.Name));
-                }
-            }
+            if (property == null)
+                throw new ArgumentException($"Property '{sortBy}' not found on type '{typeof(T).Name}'");
 
-
-
-            return query;
+            return orderBy?.ToLower() == "desc"
+                ? query.OrderByDescending(x => EF.Property<object>(x, sortBy))
+                : query.OrderBy(x => EF.Property<object>(x, sortBy));
 
         }
     }

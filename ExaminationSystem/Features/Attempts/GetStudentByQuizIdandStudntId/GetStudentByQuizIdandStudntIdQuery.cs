@@ -4,6 +4,6 @@ using MediatR;
 
 namespace ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId
 {
-    public record GetStudentByQuizIdandStudntIdQuery(PaginationParams Params,int? quizId,int? studentId):IRequest<PaginatedResult<FilteredAttemptsDTO>>;
+    public record GetStudentByQuizIdandStudntIdQuery(PaginationParams Params,int quizId,int studentId):IRequest<PaginatedResult<FilteredAttemptsDTO>>;
    
 }

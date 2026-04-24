@@ -20,7 +20,7 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin
             CancellationToken cancellationToken)
         {
             var attempt = await _repository.Query()
-                .AsNoTracking().IgnoreQueryFilters()
+                .AsNoTracking()
                 .Where(a => a.Id == request.Id )
                 .Select(a => new AttemptAdminSummaryDTO
                 {

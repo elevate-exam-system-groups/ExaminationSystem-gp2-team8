@@ -18,30 +18,23 @@ namespace ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId
         }
 
 
-        public async Task<PaginatedResult<FilteredAttemptsDTO>> Handle(GetStudentByQuizIdandStudntIdQuery request, CancellationToken cancellationToken)
+        public async Task< PaginatedResult<FilteredAttemptsDTO>> Handle(GetStudentByQuizIdandStudntIdQuery request, CancellationToken cancellationToken)
         {
-           
-            var attempts = _repository.Query()
-                .IgnoreQueryFilters()
-                            .AsNoTracking();
-            if (request.quizId.HasValue)
-            {
-                attempts = attempts.Where(a => a.QuizId == request.quizId.Value);
-            }
-            if (request.studentId.HasValue)
-            {
-                attempts = attempts.Where(a => a.UserId == request.studentId.Value);
-            }
 
-            var attemptDTO = attempts.Select(a => new FilteredAttemptsDTO()
-            {
-                Id=a.Id,
-                QuizId=a.QuizId,
-                score=a.score,
-                studentId=a.UserId,
-                status=a.Attempt.ToString(),
-            });
-            return await attemptDTO.ApplySortandOrderBy(request.Params.SortBy, request.Params.Order).ApplyPagination(request.Params.Page,request.Params.PerPage);
+            var attempts = _repository.Query()
+                //.IgnoreQueryFilters()
+                .Where(a => a.QuizId == request.quizId && a.UserId == request.studentId)
+                            .AsNoTracking().Select(a => new FilteredAttemptsDTO()
+                            {
+                                Id = a.Id,
+                                QuizId = a.QuizId,
+                                score = a.score,
+                                studentId = a.UserId,
+                                status = a.Attempt.ToString(),
+                                SubmittedAt = a.SubmittedAt
+                            });
+         
+            return await  attempts.ApplySortandOrderBy(request.Params.SortBy,request.Params.Order).ApplyPagination(request.Params.Page, request.Params.PerPage);
             
         }
     }

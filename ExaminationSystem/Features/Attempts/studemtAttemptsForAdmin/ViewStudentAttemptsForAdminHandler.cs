@@ -19,7 +19,6 @@ namespace ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin
         {
             var query = _repository.Query()
                 .AsNoTracking()
-                .IgnoreQueryFilters()
                           .Select(a => new AllAttemptForAdminDTO()
                           {
                               attemptedId=a.Id,
