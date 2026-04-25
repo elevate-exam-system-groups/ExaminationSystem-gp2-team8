@@ -8,15 +8,19 @@ using ExaminationSystem.Features.Quizzes.CreateQuiz.CreateQuestions;
 using ExaminationSystem.Features.Quizzes.DeleteQuiz;
 using ExaminationSystem.Features.Quizzes.DeleteQuiz.DeleteQuestion;
 using ExaminationSystem.Features.Quizzes.DTOS;
+using ExaminationSystem.Features.Quizzes.PublishQuiz;
+using ExaminationSystem.Features.Quizzes.UnpublishQuiz;
 using ExaminationSystem.Features.Quizzes.UpdateQuiz;
 using ExaminationSystem.Features.Quizzes.UpdateQuiz.UpdateQuestions;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExaminationSystem.API.Controllers
 {
     [Route("api/admin")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -71,6 +75,22 @@ namespace ExaminationSystem.API.Controllers
         {
             return await ControllerHelper.ExecuteAsync(
                 () => _mediator.Send(new DeleteQuizCommand(quizId)),
+                result => Ok(result));
+        }
+
+        [HttpPatch("quizzes/{quizId:int}/publish")]
+        public async Task<IActionResult> PublishQuiz(int quizId)
+        {
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new PublishQuizCommand(quizId)),
+                result => Ok(result));
+        }
+
+        [HttpPatch("quizzes/{quizId:int}/unpublish")]
+        public async Task<IActionResult> UnpublishQuiz(int quizId)
+        {
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new UnpublishQuizCommand(quizId)),
                 result => Ok(result));
         }
 
