@@ -28,7 +28,7 @@ namespace ExaminationSystem.API.Controllers
     //[Authorize(Roles = "Admin")]
     [Route("api/admin")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -152,7 +152,7 @@ namespace ExaminationSystem.API.Controllers
         public async Task<IActionResult> GetAnalyticsWithNoFilters([FromQuery]FiltersElement filters)
         {
             // Implement your analytics logic here, e.g., gather data from the database, perform calculations, etc.
-            var analyticsData = await _mediator.Send(new AnalyticswithNoFiltersOrchestrator(filters));
+            var analyticsData = await _mediator.Send(new AnalyticsOrchestrator(filters));
 
             return Ok(analyticsData);
         }

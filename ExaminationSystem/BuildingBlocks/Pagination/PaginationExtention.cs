@@ -10,7 +10,13 @@ namespace ExaminationSystem.BuildingBlocks.Pagination
             //get count
             var count= await query.CountAsync();
             //Apply pagination
-            var items =await query.Skip((PageIndex-1) * PageSize).Take(PageSize).ToListAsync();
+            var pageIndex = Math.Max(1, PageIndex);
+            var pageSize = Math.Max(1, PageSize);
+
+            var items = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             //return paginated result
 
