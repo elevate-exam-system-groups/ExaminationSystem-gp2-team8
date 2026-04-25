@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Features.Attempts.GetAttemptResult
 {
-    public record ViewAttemptResults(int studentId, int id) : IRequest<ApiResponse<ViewResultDTO>>;
+    public record ViewAttemptResults(int studentId, int id) : IRequest<ViewResultDTO>;
 
     
 

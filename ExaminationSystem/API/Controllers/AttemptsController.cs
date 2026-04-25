@@ -59,7 +59,7 @@ namespace ExaminationSystem.API.Controllers
         [HttpGet("{attemptid}/results")]
         public async Task<IActionResult> ViewAttemptsResult(int attemptid)
         {
-            int studentId = _currentUserService.UserId;
+            int studentId = 3;
             var result = await _mediator.Send(new ViewAttemptResults(studentId, attemptid));
             return Ok(result);
         }
