@@ -1,5 +1,7 @@
 using ExaminationSystem.BuildingBlocks.Helpers;
 using ExaminationSystem.BuildingBlocks.Pagination;
+using ExaminationSystem.Features.Analytics.DTO;
+using ExaminationSystem.Features.Analytics.Orchestrators;
 using ExaminationSystem.Features.Attempts.DTOs;
 using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
 using ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId;
@@ -140,10 +142,20 @@ namespace ExaminationSystem.API.Controllers
         }
 
         [HttpGet("attempts/{quizId:int}/{studentId:int}")]
-        public async Task<ActionResult<PaginatedResult<FilteredAttemptsDTO>>> GetAttemptsByQuizIdandStudentIdForAdmin(int quizId,int studentId, [FromQuery] PaginationParams pagination)
+        public async Task<ActionResult<PaginatedResult<FilteredAttemptsDTO>>> GetAttemptsByQuizIdandStudentIdForAdmin(int quizId, int studentId, [FromQuery] PaginationParams pagination)
         {
             var result = await _mediator.Send(new GetStudentByQuizIdandStudntIdQuery(pagination, quizId, studentId));
             return Ok(result);
         }
+
+        [HttpGet("analytics")]
+        public async Task<IActionResult> GetAnalyticsWithNoFilters([FromQuery]FiltersElement filters)
+        {
+            // Implement your analytics logic here, e.g., gather data from the database, perform calculations, etc.
+            var analyticsData = await _mediator.Send(new AnalyticswithNoFiltersOrchestrator(filters));
+
+            return Ok(analyticsData);
+        }
+       
     }
 }

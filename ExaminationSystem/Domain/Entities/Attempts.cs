@@ -10,7 +10,6 @@ namespace ExaminationSystem.Domain.Entities
         public DateTime? DeletedAt { get; set; }
         public int QuizId { get; set; }
         public Quiz Quiz { get; set; } = null!;
-
         public int UserId { get; set; }
         public Student User { get; set; } = null!;
         public float score { get; set; }
