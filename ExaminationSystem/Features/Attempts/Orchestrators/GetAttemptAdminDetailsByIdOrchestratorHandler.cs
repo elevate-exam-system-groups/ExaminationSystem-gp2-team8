@@ -1,7 +1,8 @@
 ﻿using ExaminationSystem.Features.AnswerQuestion.GetQuestionAnswerDetails;
 using ExaminationSystem.Features.Attempts.DTOs;
 using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
-using ExaminationSystem.Features.Quizzes.GetQuizDetails;
+
+using ExaminationSystem.Features.Quizzes.Queries.GetQuizDetails;
 using MediatR;
 
 namespace ExaminationSystem.Features.Attempts.Orchestrators
