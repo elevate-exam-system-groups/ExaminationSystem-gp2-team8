@@ -43,6 +43,7 @@ namespace ExaminationSystem
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped(typeof(IGeneralRepository<>), typeof(GeneralRepository<>));
             builder.Services.AddScoped<IDataseeding, Dataseeding>();
+            builder.Services.AddMemoryCache();
             var app = builder.Build();
 
             //using var scope = app.Services.CreateScope();

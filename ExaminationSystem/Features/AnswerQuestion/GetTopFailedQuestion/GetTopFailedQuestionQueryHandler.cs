@@ -18,12 +18,12 @@ namespace ExaminationSystem.Features.AnswerQuestion.GetTopFailedQuestion
         {
             var query = _repository.Query().AsNoTracking();
 
-            if(request.Filters.DiplomaId.HasValue)
+            if (request.Filters.DiplomaId.HasValue)
                 query = query.Where(x => x.Question.Quiz.DiplomaId == request.Filters.DiplomaId.Value);
 
-            if(request.Filters.From.HasValue)
+            if (request.Filters.From.HasValue)
                 query = query.Where(x => x.AnsweredAt >= request.Filters.From.Value);
-            if(request.Filters.To.HasValue)
+            if (request.Filters.To.HasValue)
                 query = query.Where(x => x.AnsweredAt <= request.Filters.To.Value);
 
             var result = await query

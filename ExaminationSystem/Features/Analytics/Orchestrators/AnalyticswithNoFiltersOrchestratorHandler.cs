@@ -11,16 +11,27 @@ namespace ExaminationSystem.Features.Analytics.Orchestrators
     public class AnalyticswithNoFiltersOrchestratorHandler : IRequestHandler<AnalyticswithNoFiltersOrchestrator, AnalysticsWithNoFilterDTO>
     {
         private readonly IMediator _mediator;
-        private readonly IMemoryCache _memoryCache;
-
-        public AnalyticswithNoFiltersOrchestratorHandler(IMediator mediator, IMemoryCache memoryCache)
+        private readonly IMemoryCache _cache;
+        public AnalyticswithNoFiltersOrchestratorHandler(IMediator mediator, IMemoryCache cache)
         {
           _mediator = mediator;
-          _memoryCache = memoryCache;
+          _cache = cache;
         }
         public async Task<AnalysticsWithNoFilterDTO> Handle(AnalyticswithNoFiltersOrchestrator request, CancellationToken cancellationToken)
         {
-            var cacheKey = $"admin-analytics:{request.Filters.DiplomaId}:{request.Filters.From?.ToUniversalTime():O}:{request.Filters.To?.ToUniversalTime():O}";
+            var cacheKey = $"analytics" +
+                   $"_d{request.Filters.DiplomaId}" +
+                   $"_from{request.Filters.From:yyyyMMdd}" +
+                   $"_to{request.Filters.To:yyyyMMdd}";
+
+            // Return cached result if available
+            if (_cache.TryGetValue(cacheKey, out AnalysticsWithNoFilterDTO? cached))
+                return cached!;
+
+
+
+
+            var quizzes_per_rate=await _mediator.Send(new GetPassRateByQuizQuery(request.Filters), cancellationToken);
 
             var cachedAnalytics = await _memoryCache.GetOrCreateAsync(cacheKey, async entry =>
             {
