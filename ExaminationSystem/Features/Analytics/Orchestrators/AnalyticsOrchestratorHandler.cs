@@ -41,8 +41,6 @@ namespace ExaminationSystem.Features.Analytics.Orchestrators
             var top_failed_questions = await _mediator.Send(new GetTopFailedQuestionQuery(request.Filters), cancellationToken);    
 
 
-
-
             var result= new AnalysticsWithNoFilterDTO()
             {
                 pass_rate_by_quiz = quizzes_per_rate,

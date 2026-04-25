@@ -1,9 +1,9 @@
 using ExaminationSystem.BuildingBlocks.Helpers;
 using ExaminationSystem.BuildingBlocks.Pagination;
+using ExaminationSystem.Features.AdminStats;
 using ExaminationSystem.Features.Analytics.DTO;
 using ExaminationSystem.Features.Analytics.Orchestrators;
 using ExaminationSystem.Features.Attempts.DTOs;
-using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
 using ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId;
 using ExaminationSystem.Features.Attempts.Orchestrators;
 using ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin;
@@ -148,6 +148,12 @@ namespace ExaminationSystem.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetStats(CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetAdminStatsQuery(), cancellationToken);
+            return Ok(result);
+        }
         [HttpGet("analytics")]
         public async Task<IActionResult> GetAnalyticsWithNoFilters([FromQuery]FiltersElement filters)
         {

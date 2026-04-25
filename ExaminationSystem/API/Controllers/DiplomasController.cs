@@ -3,7 +3,10 @@ using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Features.Diplomas.DTOS;
 using ExaminationSystem.Features.Diplomas.Queries;
 using ExaminationSystem.Features.Diplomas.Queries.GetAllDiplomas;
+<<<<<<< HEAD
 using ExaminationSystem.Features.Diplomas.Queries.GetPublishedDiplomaById;
+=======
+>>>>>>> 64cb826a6f014f0d496b113c7980e9684634c50b
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
