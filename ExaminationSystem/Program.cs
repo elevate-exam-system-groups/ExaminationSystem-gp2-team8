@@ -26,6 +26,7 @@ namespace ExaminationSystem
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddMemoryCache();
 
             builder.Services.AddDbContext<ExamAppDbContext>(options =>
                 options.UseSqlServer(
@@ -45,7 +46,6 @@ namespace ExaminationSystem
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped(typeof(IGeneralRepository<>), typeof(GeneralRepository<>));
             builder.Services.AddScoped<IDataseeding, Dataseeding>();
-            builder.Services.AddMemoryCache();
             var app = builder.Build();
 
             //using var scope = app.Services.CreateScope();

@@ -3,7 +3,6 @@ using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Features.Analytics.DTO;
 using ExaminationSystem.Features.Analytics.Orchestrators;
 using ExaminationSystem.Features.Attempts.DTOs;
-using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
 using ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId;
 using ExaminationSystem.Features.Attempts.Orchestrators;
 using ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin;
