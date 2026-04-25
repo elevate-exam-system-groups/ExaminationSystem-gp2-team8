@@ -1,6 +1,10 @@
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace ExaminationSystem.Infrastructure.Persistence.Repositories
 {
@@ -24,6 +28,23 @@ namespace ExaminationSystem.Infrastructure.Persistence.Repositories
 
         public async Task<List<TEntity>> GetAllAsync() =>
             await _dbcontext.Set<TEntity>().ToListAsync();
+
+        public IQueryable<TEntity> GetAllAsync(Expression<Func<TEntity, bool>>? expression = null/*,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null*/)
+        {
+            IQueryable<TEntity> query = _dbcontext.Set<TEntity>();
+
+            //if (include is not null)
+            //{
+            //    query = include(query);
+            //}
+            if (expression is not null)
+            {
+                query = query.Where(expression);
+            }
+
+            return query;
+        }
 
         public async Task<TEntity?> GetByIdAsync(int id) =>
             await _dbcontext.Set<TEntity>()
