@@ -18,25 +18,31 @@ namespace ExaminationSystem.Features.AnswerQuestion.GetTopFailedQuestion
         {
             var query = _repository.Query().AsNoTracking();
 
-            if(request.Filters.DiplomaId.HasValue)
+            if (request.Filters.DiplomaId.HasValue)
                 query = query.Where(x => x.Question.Quiz.DiplomaId == request.Filters.DiplomaId.Value);
 
-            if(request.Filters.From.HasValue)
+            if (request.Filters.From.HasValue)
                 query = query.Where(x => x.AnsweredAt >= request.Filters.From.Value);
-            if(request.Filters.To.HasValue)
+            if (request.Filters.To.HasValue)
                 query = query.Where(x => x.AnsweredAt <= request.Filters.To.Value);
 
-            var result = await query.GroupBy(x=>new { x.QuestionId, x.Question.QuestionText })
-                        .Select(g=> new TopFailedQuestionDTO()
-                        {
-                              QuestionId= g.Key.QuestionId,
-                              QuestionText = g.Key.QuestionText,
-                              FailedCount = g.Count(x=> !x.IsCorrect)
-                        })
-                        .OrderByDescending(x=> x.FailedCount)
-                        .Take(5)
-                        .ToListAsync();
-            return result;
+            var result = await query
+                         .GroupBy(x => new { x.QuestionId, x.Question.QuestionText })
+                         .Select(g => new TopFailedQuestionDTO
+                         {
+                             QuestionId = g.Key.QuestionId,
+                             QuestionText = g.Key.QuestionText,
+                             FailedCount = g.Count(x => !x.IsCorrect),
+                             TotalCount = g.Count(),                                    // ← add this
+                             CorrectRate = (double)g.Count(x => x.IsCorrect) /          // ← add this
+                                            g.Count() * 100
+                         })
+                         .Where(x => x.TotalCount > 0)                                    // ← exclude unanswered
+                         .Where(x => x.CorrectRate < 40)                                  // ← the 40% rule
+                         .OrderByDescending(x => x.FailedCount)
+                         .Take(5)
+                         .ToListAsync(cancellationToken);                                  // ← pass cancellationToken
+                                return result;
         }
     }
 }
