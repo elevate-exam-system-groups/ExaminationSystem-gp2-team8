@@ -26,16 +26,30 @@ namespace ExaminationSystem.Features.AnswerQuestion.GetTopFailedQuestion
             if(request.Filters.To.HasValue)
                 query = query.Where(x => x.AnsweredAt <= request.Filters.To.Value);
 
-            var result = await query.GroupBy(x=>new { x.QuestionId, x.Question.QuestionText })
-                        .Select(g=> new TopFailedQuestionDTO()
-                        {
-                              QuestionId= g.Key.QuestionId,
-                              QuestionText = g.Key.QuestionText,
-                              FailedCount = g.Count(x=> !x.IsCorrect)
-                        })
-                        .OrderByDescending(x=> x.FailedCount)
-                        .Take(5)
-                        .ToListAsync();
+            var result = await query
+                .GroupBy(x => new { x.QuestionId, x.Question.QuestionText })
+                .Select(g => new
+                {
+                    g.Key.QuestionId,
+                    g.Key.QuestionText,
+                    AnswerCount = g.Count(),
+                    FailedCount = g.Count(x => !x.IsCorrect),
+                    CorrectCount = g.Count(x => x.IsCorrect)
+                })
+                .Where(x => x.AnswerCount > 0 &&
+                            ((double)x.CorrectCount * 100 / x.AnswerCount) < 40)
+                .OrderBy(x => (double)x.CorrectCount * 100 / x.AnswerCount)
+                .ThenByDescending(x => x.FailedCount)
+                .Take(5)
+                .Select(x => new TopFailedQuestionDTO
+                {
+                    QuestionId = x.QuestionId,
+                    QuestionText = x.QuestionText,
+                    FailedCount = x.FailedCount,
+                    CorrectAnswerRate = (double)x.CorrectCount * 100 / x.AnswerCount
+                })
+                .ToListAsync();
+
             return result;
         }
     }

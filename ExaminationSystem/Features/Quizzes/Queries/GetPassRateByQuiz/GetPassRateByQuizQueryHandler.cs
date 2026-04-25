@@ -17,38 +17,37 @@ namespace ExaminationSystem.Features.Quizzes.Queries.GetPassRateByQuiz
         }
         public async Task<IEnumerable<PassRateByQuizDTO>> Handle(GetPassRateByQuizQuery request, CancellationToken cancellationToken)
         {
-            var query = _repository.Query()
-                       .AsNoTracking();
-
+            var query = _repository.Query().AsNoTracking();
+            var from = request.Filters.From;
+            var to = request.Filters.To;
 
             if (request.Filters.DiplomaId.HasValue)
             {
                 query = query.Where(q => q.DiplomaId == request.Filters.DiplomaId.Value);
             }
-            if (request.Filters.From.HasValue)
-            {
-                query = query.Where(q =>
-                    q.Attempts.Any(a => a.SubmittedAt >= request.Filters.From.Value));
-            }
 
-            if (request.Filters.To.HasValue)
-            {
-                query = query.Where(q =>
-                    q.Attempts.Any(a => a.SubmittedAt <= request.Filters.To.Value));
-            }
-            var quizzes = await query.Select(x => new PassRateByQuizDTO
-            {
-                QuizId = x.Id,
-                QuizTitle = x.Title,
-                TotalAttempts = x.Attempts.Count(),
-                PassedAttempts = x.Attempts.Count(a => a.score >= x.PassScore),
-                PassRate = x.Attempts.Count() == 0
-                 ? 0
-                 : (double)x.Attempts.Count(a => a.score >= x.PassScore)
-                   * 100 / x.Attempts.Count()
-            })
-            .ToListAsync(cancellationToken);
+            var quizzes = await query
+                .Select(x => new PassRateByQuizDTO
+                {
+                    QuizId = x.Id,
+                    QuizTitle = x.Title,
+                    TotalAttempts = x.Attempts.Count(a =>
+                        (!from.HasValue || a.SubmittedAt >= from.Value) &&
+                        (!to.HasValue || a.SubmittedAt <= to.Value)),
+                    PassedAttempts = x.Attempts.Count(a =>
+                        (!from.HasValue || a.SubmittedAt >= from.Value) &&
+                        (!to.HasValue || a.SubmittedAt <= to.Value) &&
+                        a.score >= x.PassScore)
+                })
+                .Where(x => x.TotalAttempts > 0)
+                .ToListAsync();
 
+            foreach (var quiz in quizzes)
+            {
+                quiz.PassRate = quiz.TotalAttempts == 0
+                    ? 0
+                    : (double)quiz.PassedAttempts * 100 / quiz.TotalAttempts;
+            }
 
             return quizzes;
         }

@@ -3,7 +3,6 @@ using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Features.Analytics.DTO;
 using ExaminationSystem.Features.Analytics.Orchestrators;
 using ExaminationSystem.Features.Attempts.DTOs;
-using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
 using ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId;
 using ExaminationSystem.Features.Attempts.Orchestrators;
 using ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin;
@@ -151,7 +150,6 @@ namespace ExaminationSystem.API.Controllers
         [HttpGet("analytics")]
         public async Task<IActionResult> GetAnalyticsWithNoFilters([FromQuery]FiltersElement filters)
         {
-            // Implement your analytics logic here, e.g., gather data from the database, perform calculations, etc.
             var analyticsData = await _mediator.Send(new AnalyticswithNoFiltersOrchestrator(filters));
 
             return Ok(analyticsData);

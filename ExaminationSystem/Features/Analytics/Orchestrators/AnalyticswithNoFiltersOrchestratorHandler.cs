@@ -4,36 +4,46 @@ using ExaminationSystem.Features.Attempts.GetAttemptsOverTime;
 using ExaminationSystem.Features.Diplomas.Queries.GetAvergeScorePerDiploma;
 using ExaminationSystem.Features.Quizzes.Queries.GetPassRateByQuiz;
 using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ExaminationSystem.Features.Analytics.Orchestrators
 {
     public class AnalyticswithNoFiltersOrchestratorHandler : IRequestHandler<AnalyticswithNoFiltersOrchestrator, AnalysticsWithNoFilterDTO>
     {
         private readonly IMediator _mediator;
+        private readonly IMemoryCache _memoryCache;
 
-        public AnalyticswithNoFiltersOrchestratorHandler(IMediator mediator)
+        public AnalyticswithNoFiltersOrchestratorHandler(IMediator mediator, IMemoryCache memoryCache)
         {
           _mediator = mediator;
+          _memoryCache = memoryCache;
         }
         public async Task<AnalysticsWithNoFilterDTO> Handle(AnalyticswithNoFiltersOrchestrator request, CancellationToken cancellationToken)
         {
-            var quizzes_per_rate=await _mediator.Send(new GetPassRateByQuizQuery(request.Filters), cancellationToken);
+            var cacheKey = $"admin-analytics:{request.Filters.DiplomaId}:{request.Filters.From?.ToUniversalTime():O}:{request.Filters.To?.ToUniversalTime():O}";
 
-            var avg_score_by_diploma=await _mediator.Send(new GetAverageScorePerDiploamQuery(request.Filters), cancellationToken);
-
-            var attempts_over_time=await _mediator.Send(new GetAttemptsOverTimeQuery(request.Filters), cancellationToken);
-
-            // top_failed_questions
-            var top_failed_questions = await _mediator.Send(new GetTopFailedQuestionQuery(request.Filters), cancellationToken);    
-
-            return new AnalysticsWithNoFilterDTO()
+            var cachedAnalytics = await _memoryCache.GetOrCreateAsync(cacheKey, async entry =>
             {
-                pass_rate_by_quiz = quizzes_per_rate,
-                Avg_score_by_diploma = avg_score_by_diploma,
-                attempts_over_time = attempts_over_time,
-                top_failed_questions = top_failed_questions
-            };
-           
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+
+                var quizzes_per_rate = await _mediator.Send(new GetPassRateByQuizQuery(request.Filters));
+
+                var avg_score_by_diploma = await _mediator.Send(new GetAverageScorePerDiploamQuery(request.Filters));
+
+                var attempts_over_time = await _mediator.Send(new GetAttemptsOverTimeQuery(request.Filters));
+
+                var top_failed_questions = await _mediator.Send(new GetTopFailedQuestionQuery(request.Filters));
+
+                return new AnalysticsWithNoFilterDTO()
+                {
+                    pass_rate_by_quiz = quizzes_per_rate,
+                    Avg_score_by_diploma = avg_score_by_diploma,
+                    attempts_over_time = attempts_over_time,
+                    top_failed_questions = top_failed_questions
+                };
+            });
+
+            return cachedAnalytics!;
         }
     }
 }

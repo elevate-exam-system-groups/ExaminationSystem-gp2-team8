@@ -28,15 +28,30 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptsOverTime
             if (request.Filters.To.HasValue)
                 query = query.Where(a => a.SubmittedAt <= request.Filters.To.Value);
 
-            return await query
-                .GroupBy(a => a.SubmittedAt.Date)
-                .Select(g => new GetAttemptsOverTimeDTO
+            var groupedAttempts = await query
+                .GroupBy(a => new
                 {
-                    SubmittedAt = g.Key,
+                    a.SubmittedAt.Year,
+                    a.SubmittedAt.Month,
+                    a.SubmittedAt.Day
+                })
+                .Select(g => new
+                {
+                    g.Key.Year,
+                    g.Key.Month,
+                    g.Key.Day,
                     AttemptCount = g.Count()
                 })
-                .OrderBy(x => x.SubmittedAt)   // consistent time-series order
-                .ToListAsync(cancellationToken);
+                .OrderBy(x => x.Year)
+                .ThenBy(x => x.Month)
+                .ThenBy(x => x.Day)
+                .ToListAsync();
+
+            return groupedAttempts.Select(x => new GetAttemptsOverTimeDTO
+            {
+                SubmittedAt = new DateTime(x.Year, x.Month, x.Day, 0, 0, 0, DateTimeKind.Utc),
+                AttemptCount = x.AttemptCount
+            });
         }
     }
 }

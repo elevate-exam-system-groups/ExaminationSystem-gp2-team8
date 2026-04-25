@@ -1,5 +1,4 @@
 ﻿using ExaminationSystem.API.Extensions;
-using ExaminationSystem.API.Middlewares;
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Infrastructure.Identity;
@@ -26,6 +25,7 @@ namespace ExaminationSystem
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddMemoryCache();
 
             builder.Services.AddDbContext<ExamAppDbContext>(options =>
                 options.UseSqlServer(
@@ -34,8 +34,6 @@ namespace ExaminationSystem
             builder.Services.AddIdentity<User, IdentityRole<int>>()
                 .AddEntityFrameworkStores<ExamAppDbContext>()
                 .AddDefaultTokenProviders();
-
-
 
             builder.Services.AddInfrastructureServices();
 

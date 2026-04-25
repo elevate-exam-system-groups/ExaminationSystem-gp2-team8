@@ -1,10 +1,8 @@
 ﻿using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Features.Diplomas.DTOS;
-
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ExaminationSystem.Features.Diplomas.Queries.GetAvergeScorePerDiploma
 {
@@ -30,6 +28,7 @@ namespace ExaminationSystem.Features.Diplomas.Queries.GetAvergeScorePerDiploma
 
             var from = request.Filters.From;
             var to = request.Filters.To;
+
 
             return await query
                 .Select(d => new AverageScorePerDiploamDTO
