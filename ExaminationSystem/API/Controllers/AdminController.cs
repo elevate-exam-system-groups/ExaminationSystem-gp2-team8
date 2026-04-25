@@ -1,5 +1,6 @@
 using ExaminationSystem.BuildingBlocks.Helpers;
 using ExaminationSystem.BuildingBlocks.Pagination;
+using ExaminationSystem.Features.Analytics.DTO;
 using ExaminationSystem.Features.Analytics.Orchestrators;
 using ExaminationSystem.Features.Attempts.DTOs;
 using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
@@ -129,12 +130,13 @@ namespace ExaminationSystem.API.Controllers
         }
 
         [HttpGet("analytics")]
-        public async Task<IActionResult> GetAnalyticsWithNoFilters()
+        public async Task<IActionResult> GetAnalyticsWithNoFilters([FromQuery]FiltersElement filters)
         {
             // Implement your analytics logic here, e.g., gather data from the database, perform calculations, etc.
-            var analyticsData = await _mediator.Send(new AnalyticswithNoFiltersOrchestrator());
+            var analyticsData = await _mediator.Send(new AnalyticswithNoFiltersOrchestrator(filters));
 
             return Ok(analyticsData);
         }
+       
     }
 }

@@ -15,6 +15,10 @@ namespace ExaminationSystem.Features.AnswerQuestion.GetQuestionAnswerDetails
         }
         public async Task<IEnumerable<GetAnswerDetailsDTO>> Handle(GetAnswerWithAnswerDetailsQuery request, CancellationToken cancellationToken)
         {
+
+           
+
+
             var answers = await _repository.Query()
                  .AsNoTracking()
                  .Where(sa => sa.AttemptId == request.attemptId)

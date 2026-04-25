@@ -17,23 +17,40 @@ namespace ExaminationSystem.Features.Quizzes.Queries.GetPassRateByQuiz
         }
         public async Task<IEnumerable<PassRateByQuizDTO>> Handle(GetPassRateByQuizQuery request, CancellationToken cancellationToken)
         {
-
-            var quizzes=await _repository.Query()
-                .AsNoTracking()
-                 .Select(q => new PassRateByQuizDTO
-                 {
-                     QuizId = q.Id,
-                     QuizTitle = q.Title,
-                     TotalAttempts = q.Attempts.Count(),
-                     PassedAttempts = q.Attempts.Count(a => a.score >= q.PassScore),
-                     PassRate = q.Attempts.Count() == 0
-                        ? 0
-                        : (double)q.Attempts.Count(a => a.score >= q.PassScore) * 100 / q.Attempts.Count()
-                 })
-                .ToListAsync(cancellationToken);
+            var query = _repository.Query()
+                       .AsNoTracking();
 
 
-            return  quizzes;
+            if (request.Filters.DiplomaId.HasValue)
+            {
+                query = query.Where(q => q.DiplomaId == request.Filters.DiplomaId.Value);
+            }
+            if (request.Filters.From.HasValue)
+            {
+                query = query.Where(q =>
+                    q.Attempts.Any(a => a.SubmittedAt >= request.Filters.From.Value));
+            }
+
+            if (request.Filters.To.HasValue)
+            {
+                query = query.Where(q =>
+                    q.Attempts.Any(a => a.SubmittedAt <= request.Filters.To.Value));
+            }
+            var quizzes = await query.Select(x => new PassRateByQuizDTO
+            {
+                QuizId = x.Id,
+                QuizTitle = x.Title,
+                TotalAttempts = x.Attempts.Count(),
+                PassedAttempts = x.Attempts.Count(a => a.score >= x.PassScore),
+                PassRate = x.Attempts.Count() == 0
+                 ? 0
+                 : (double)x.Attempts.Count(a => a.score >= x.PassScore)
+                   * 100 / x.Attempts.Count()
+            })
+            .ToListAsync(cancellationToken);
+
+
+            return quizzes;
         }
     }
 }

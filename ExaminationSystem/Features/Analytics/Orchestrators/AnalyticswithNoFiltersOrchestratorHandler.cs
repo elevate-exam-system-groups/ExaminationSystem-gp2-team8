@@ -17,14 +17,14 @@ namespace ExaminationSystem.Features.Analytics.Orchestrators
         }
         public async Task<AnalysticsWithNoFilterDTO> Handle(AnalyticswithNoFiltersOrchestrator request, CancellationToken cancellationToken)
         {
-            var quizzes_per_rate=await _mediator.Send(new GetPassRateByQuizQuery(), cancellationToken);
+            var quizzes_per_rate=await _mediator.Send(new GetPassRateByQuizQuery(request.Filters), cancellationToken);
 
-            var avg_score_by_diploma=await _mediator.Send(new GetAverageScorePerDiploamQuery(), cancellationToken);
+            var avg_score_by_diploma=await _mediator.Send(new GetAverageScorePerDiploamQuery(request.Filters), cancellationToken);
 
-            var attempts_over_time=await _mediator.Send(new GetAttemptsOverTimeQuery(), cancellationToken);
+            var attempts_over_time=await _mediator.Send(new GetAttemptsOverTimeQuery(request.Filters), cancellationToken);
 
             // top_failed_questions
-            var top_failed_questions = await _mediator.Send(new GetTopFailedQuestionQuery(), cancellationToken);    
+            var top_failed_questions = await _mediator.Send(new GetTopFailedQuestionQuery(request.Filters), cancellationToken);    
 
             return new AnalysticsWithNoFilterDTO()
             {

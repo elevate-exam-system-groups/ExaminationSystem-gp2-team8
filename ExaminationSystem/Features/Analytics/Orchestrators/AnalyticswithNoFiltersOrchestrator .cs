@@ -3,6 +3,10 @@ using MediatR;
 
 namespace ExaminationSystem.Features.Analytics.Orchestrators
 {
-    public record AnalyticswithNoFiltersOrchestrator:IRequest<AnalysticsWithNoFilterDTO>;
+    public record AnalyticswithNoFiltersOrchestrator(
+       FiltersElement Filters
+
+
+        ) :IRequest<AnalysticsWithNoFilterDTO>;
     
 }
