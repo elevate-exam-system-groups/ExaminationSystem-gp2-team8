@@ -26,6 +26,7 @@ namespace ExaminationSystem
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddMemoryCache();
 
             builder.Services.AddDbContext<ExamAppDbContext>(options =>
                 options.UseSqlServer(

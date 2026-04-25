@@ -8,16 +8,16 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace ExaminationSystem.Features.Analytics.Orchestrators
 {
-    public class AnalyticswithNoFiltersOrchestratorHandler : IRequestHandler<AnalyticswithNoFiltersOrchestrator, AnalysticsWithNoFilterDTO>
+    public class AnalyticsOrchestratorHandler : IRequestHandler<AnalyticsOrchestrator, AnalysticsWithNoFilterDTO>
     {
         private readonly IMediator _mediator;
         private readonly IMemoryCache _cache;
-        public AnalyticswithNoFiltersOrchestratorHandler(IMediator mediator, IMemoryCache cache)
+        public AnalyticsOrchestratorHandler(IMediator mediator, IMemoryCache cache)
         {
           _mediator = mediator;
           _cache = cache;
         }
-        public async Task<AnalysticsWithNoFilterDTO> Handle(AnalyticswithNoFiltersOrchestrator request, CancellationToken cancellationToken)
+        public async Task<AnalysticsWithNoFilterDTO> Handle(AnalyticsOrchestrator request, CancellationToken cancellationToken)
         {
             var cacheKey = $"analytics" +
                    $"_d{request.Filters.DiplomaId}" +
@@ -39,8 +39,6 @@ namespace ExaminationSystem.Features.Analytics.Orchestrators
 
             // top_failed_questions
             var top_failed_questions = await _mediator.Send(new GetTopFailedQuestionQuery(request.Filters), cancellationToken);    
-
-
 
 
             var result= new AnalysticsWithNoFilterDTO()

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace ExaminationSystem.Features.Analytics.Orchestrators
 {
-    public record AnalyticswithNoFiltersOrchestrator(
+    public record AnalyticsOrchestrator(
        FiltersElement Filters
 
 
