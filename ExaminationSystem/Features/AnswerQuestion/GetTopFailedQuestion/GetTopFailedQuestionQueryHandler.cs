@@ -33,15 +33,15 @@ namespace ExaminationSystem.Features.AnswerQuestion.GetTopFailedQuestion
                              QuestionId = g.Key.QuestionId,
                              QuestionText = g.Key.QuestionText,
                              FailedCount = g.Count(x => !x.IsCorrect),
-                             TotalCount = g.Count(),                                    // ← add this
-                             CorrectRate = (double)g.Count(x => x.IsCorrect) /          // ← add this
+                             TotalCount = g.Count(),                                   
+                             CorrectRate = (double)g.Count(x => x.IsCorrect) /          
                                             g.Count() * 100
                          })
-                         .Where(x => x.TotalCount > 0)                                    // ← exclude unanswered
-                         .Where(x => x.CorrectRate < 40)                                  // ← the 40% rule
+                         .Where(x => x.TotalCount > 0)                                   
+                         .Where(x => x.CorrectRate < 40)                                  
                          .OrderByDescending(x => x.FailedCount)
                          .Take(5)
-                         .ToListAsync(cancellationToken);                                  // ← pass cancellationToken
+                         .ToListAsync(cancellationToken);                                  
                                 return result;
         }
     }
