@@ -1,5 +1,6 @@
 using ExaminationSystem.BuildingBlocks.Helpers;
 using ExaminationSystem.BuildingBlocks.Pagination;
+using ExaminationSystem.Features.AdminStats;
 using ExaminationSystem.Features.Attempts.DTOs;
 using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
 using ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId;
@@ -124,6 +125,13 @@ namespace ExaminationSystem.API.Controllers
         public async Task<ActionResult<PaginatedResult<FilteredAttemptsDTO>>> GetAttemptsByQuizIdandStudentIdForAdmin(int quizId,int studentId, [FromQuery] PaginationParams pagination)
         {
             var result = await _mediator.Send(new GetStudentByQuizIdandStudntIdQuery(pagination, quizId, studentId));
+            return Ok(result);
+        }
+
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetStats(CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetAdminStatsQuery(), cancellationToken);
             return Ok(result);
         }
     }
