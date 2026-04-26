@@ -1,13 +1,16 @@
 using ExaminationSystem.BuildingBlocks.Exceptions;
+using ExaminationSystem.Domain.Common;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
+using ExaminationSystem.Features.AdminStats.DTOs;
 using ExaminationSystem.Features.Users.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using System.Collections;
 
 namespace ExaminationSystem.Features.Users.RegisterUser
 {
-    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, RegisterResponseDto>
+    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, Result<RegisterResponseDto>>
     {
         private readonly UserManager<User> _userManager;
 
@@ -16,7 +19,7 @@ namespace ExaminationSystem.Features.Users.RegisterUser
             _userManager = userManager;
         }
 
-        public async Task<RegisterResponseDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result<RegisterResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             var dto = request.userDto;
 
@@ -40,13 +43,16 @@ namespace ExaminationSystem.Features.Users.RegisterUser
 
             await _userManager.AddToRoleAsync(user, "Student");
 
-            return new RegisterResponseDto
+            var registerResponseDto = new RegisterResponseDto
             {
                 UserId = user.Id,
                 Email = user.Email!,
                 FullName = user.FullName,
                 Message = "Account created.",
             };
+            if (registerResponseDto is null)
+                return Result<RegisterResponseDto>.Failure("No data found.", 404);
+            return Result<RegisterResponseDto>.Success(registerResponseDto);
         }
     }
 }

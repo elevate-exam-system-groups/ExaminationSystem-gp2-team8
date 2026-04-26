@@ -1,6 +1,8 @@
-﻿namespace ExaminationSystem.Domain.Common
+﻿using System.Text.Json.Serialization;
+
+namespace ExaminationSystem.Domain.Common
 {
-    public class Result<T>
+    public record Result<T>
     {
         //public bool IsSuccess { get; set; }
         //public string? Message { get; set; }
@@ -20,7 +22,8 @@
         public T? Value { get; private set; }
         public string Error { get; private set; } = string.Empty;
         public int StatusCode { get; private set; }
-
+        [JsonIgnore]
+        public string? RefreshToken { get; init; }
         // Private constructor — force use of factory methods
         private Result() { }
 
