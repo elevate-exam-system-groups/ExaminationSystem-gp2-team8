@@ -1,15 +1,19 @@
 ﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.Domain.Common;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
+using ExaminationSystem.Features.AdminStats.DTOs;
 using ExaminationSystem.Features.AnswerQuestion.DTOs;
 using ExaminationSystem.Infrastructure.Persistence;
 using ExaminationSystem.Infrastructure.Services;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 
 namespace ExaminationSystem.Features.AnswerQuestion
 {
-    public class SubmitAnswerHandler : IRequestHandler<SubmitAnswerCommand, ApiResponse<SubmitAnswerResponseDto>>
+    public class SubmitAnswerHandler : IRequestHandler<SubmitAnswerCommand, Result<SubmitAnswerResponseDto>>
     {
         private readonly ExamAppDbContext _db;
         private readonly IAutoSubmitService _autoSubmit;
@@ -24,7 +28,7 @@ namespace ExaminationSystem.Features.AnswerQuestion
             _autoSubmit = autoSubmit;
             _logger = logger;
         }
-        public async Task<ApiResponse<SubmitAnswerResponseDto>> Handle(SubmitAnswerCommand request, CancellationToken cancellationToken)
+        public async Task<Result<SubmitAnswerResponseDto>> Handle(SubmitAnswerCommand request, CancellationToken cancellationToken)
         {
             var dto = request.Dto;
 
@@ -34,11 +38,11 @@ namespace ExaminationSystem.Features.AnswerQuestion
                 .FirstOrDefaultAsync(a => a.Id == request.AttemptId, cancellationToken);
 
             if (attempt is null)
-                return ApiResponse<SubmitAnswerResponseDto>.Fail("Attempt not found.", statusCode: 404);
+                return Result<SubmitAnswerResponseDto>.Failure("Attempt not found.", statusCode: 404);
 
             //  Verify ownership — student must own this attempt 
             if (attempt.UserId != request.CurrentUserId)
-                return ApiResponse<SubmitAnswerResponseDto>.Fail("Access denied. You do not own this attempt.", statusCode: 403);
+                return Result<SubmitAnswerResponseDto>.Failure("Access denied. You do not own this attempt.", statusCode: 403);
 
             // Server-side timer check — enforce deadline on EVERY request ─ Per user story: if timer has elapsed → auto-submit → 410 Gone
             if (attempt.IsExpired)
@@ -47,12 +51,12 @@ namespace ExaminationSystem.Features.AnswerQuestion
 
                 _logger.LogWarning("Answer submitted after deadline. Attempt {AttemptId} auto-submitted.", attempt.Id);
 
-                return ApiResponse<SubmitAnswerResponseDto>.Fail("Time limit exceeded. Your attempt has been automatically submitted with answers on record.",statusCode: 410);
+                return Result<SubmitAnswerResponseDto>.Failure("Time limit exceeded. Your attempt has been automatically submitted with answers on record.",statusCode: 410);
             }
 
             // Reject if attempt is already closed (submitted or timed out) 
             if (attempt.Attempt != AttemptStatus.InProgress)
-                return ApiResponse<SubmitAnswerResponseDto>.Fail("This attempt has already been submitted and cannot be modified.",statusCode: 409);
+                return Result<SubmitAnswerResponseDto>.Failure("This attempt has already been submitted and cannot be modified.",statusCode: 409);
 
             // Validate question belongs to this quiz
             var question = await _db.Questions
@@ -62,7 +66,7 @@ namespace ExaminationSystem.Features.AnswerQuestion
                     cancellationToken);
 
             if (question is null)
-                return ApiResponse<SubmitAnswerResponseDto>.Fail($"Question {dto.QuestionId} does not belong to this quiz.",statusCode: 422);
+                return Result<SubmitAnswerResponseDto>.Failure($"Question {dto.QuestionId} does not belong to this quiz.",statusCode: 422);
 
             // Validate selected option belongs to this question 
             var selectedOption = await _db.Options
@@ -72,7 +76,7 @@ namespace ExaminationSystem.Features.AnswerQuestion
                     cancellationToken);
 
             if (selectedOption is null)
-                return ApiResponse<SubmitAnswerResponseDto>.Fail($"Option {dto.SelectedOptionId} does not belong to question {dto.QuestionId}.",statusCode: 422);
+                return Result<SubmitAnswerResponseDto>.Failure($"Option {dto.SelectedOptionId} does not belong to question {dto.QuestionId}.",statusCode: 422);
 
             // UPSERT answer — re-answering overwrites previous answer
             //      Unique index on (AttemptId, QuestionId) in DB enforces one row per question.
@@ -109,13 +113,18 @@ namespace ExaminationSystem.Features.AnswerQuestion
             // Calculate remaining seconds for client timer display 
             var secondsRemaining = (int)Math.Max(0, (attempt.Deadline - DateTime.UtcNow).TotalSeconds);
 
-            return ApiResponse<SubmitAnswerResponseDto>.Ok(new SubmitAnswerResponseDto
+            var submitresponse = new SubmitAnswerResponseDto
             {
                 Saved = true,
                 QuestionId = dto.QuestionId,
                 AttemptId = attempt.Id,
                 SecondsRemaining = secondsRemaining,
-            }, "Answer saved successfully.");
+            };
+            if (submitresponse is null)
+                return Result<SubmitAnswerResponseDto>.Failure("No data found.", 404);
+
+            return Result<SubmitAnswerResponseDto>.Success(submitresponse);
+            
         }
     }
 }

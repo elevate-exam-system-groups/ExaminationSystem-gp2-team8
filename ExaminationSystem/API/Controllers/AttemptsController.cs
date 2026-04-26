@@ -1,11 +1,12 @@
 ﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
 using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Features.AdminStats.DTOs;
 using ExaminationSystem.Features.AnswerQuestion;
 using ExaminationSystem.Features.AnswerQuestion.DTOs;
 using ExaminationSystem.Features.Attempts;
 using ExaminationSystem.Features.Attempts.GetAttemptDetails;
-using ExaminationSystem.Features.Attempts.GetAttempts;
 using ExaminationSystem.Features.Attempts.GetAttemptResult;
+using ExaminationSystem.Features.Attempts.GetAttempts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,7 +61,11 @@ namespace ExaminationSystem.API.Controllers
         {
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
             var result = await _mediator.Send(new SubmitAnswerCommand(attemptId, studentId, dto), cancellationToken);
-            return Ok(ApiResponse<object>.Ok(result));
+            if (result.IsFailure)
+                return StatusCode(result.StatusCode,
+                    ApiResponse<SubmitAnswerResponseDto>.Fail(result.Error));
+
+            return Ok(ApiResponse<SubmitAnswerResponseDto>.Ok(result.Value!));
         }
     }
 }
