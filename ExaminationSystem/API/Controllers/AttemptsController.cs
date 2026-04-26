@@ -66,6 +66,8 @@ namespace ExaminationSystem.API.Controllers
                 return Unauthorized(ApiResponse<object>.FailureResponse("Invalid token.", "401"));
 
             var result = await _mediator.Send(new ViewAttemptResults(userId, attemptid));
+            int studentId = 3;
+            var result = await _mediator.Send(new ViewAttemptResults(studentId, attemptid));
             return Ok(result);
         }
 

@@ -26,7 +26,6 @@
     <Folder Include="BuildingBlocks\Behaviors\" />
     <Folder Include="Domain\Events\" />
     <Folder Include="Domain\ValueObjects\" />
-    <Folder Include="Features\Analytics\Queries\" />
     <Folder Include="Tests\" />
   </ItemGroup>
 

@@ -2,9 +2,28 @@
 {
     public class PaginationParams
     {
-        public int Page { get; set; } = 1;
-        public int PerPage { get; set; } = 20;
-        public string? SortBy { get; set; } 
-        public string? Order { get; set; } = "asc";
+        private int _page = 1;
+        private int _perPage = 10;
+
+        public int Page
+        {
+            get => _page;
+            set => _page = value < 1 ? 1 : value;
+        }
+
+        public int PerPage
+        {
+            get => _perPage;
+            set => _perPage = value < 1 ? 10 : (value > 100 ? 100 : value);
+        }
+
+        public string? SortBy { get; set; }
+
+        public string Order
+        {
+            get => _order;
+            set => _order = value?.ToLower() == "desc" ? "desc" : "asc";
+        }
+        private string _order = "asc";
     }
 }

@@ -1,5 +1,12 @@
 ﻿using ExaminationSystem.Features.Diplomas.Queries;
+﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
+using ExaminationSystem.BuildingBlocks.Pagination;
+using ExaminationSystem.Features.Diplomas.DTOS;
+using ExaminationSystem.Features.Diplomas.Queries;
 using ExaminationSystem.Features.Diplomas.Queries.GetAllDiplomas;
+
+using ExaminationSystem.Features.Diplomas.Queries.GetPublishedDiplomaById;
+
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +26,10 @@ namespace ExaminationSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllDiplomas([FromQuery] int page = 1, [FromQuery] int perPage = 10, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllDiplomas([FromQuery] PaginationParams Params, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new GetAllDiplomasQuery(page, perPage), cancellationToken);
+            int userId = 3;
+            var result = await _mediator.Send(new GetAllpublishedDiplomasQuery(Params, userId), cancellationToken);
             return Ok(result);
         }
 
@@ -29,16 +37,6 @@ namespace ExaminationSystem.API.Controllers
         public async Task<IActionResult> GetDiplomaById(int diplomaId, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetPublishDiplomaByIdQuery(diplomaId), cancellationToken);
-
-            if (!result.isSuccess)
-            {
-                return result.Error?.Code switch
-                {
-                    "NOT_FOUND" => NotFound(result),
-                    "FORBIDDEN" => StatusCode(403, result),
-                    _ => BadRequest(result)
-                };
-            }
             return Ok(result);
         }
         
