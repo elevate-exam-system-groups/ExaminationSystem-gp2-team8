@@ -1,5 +1,6 @@
 ﻿using ExaminationSystem.Domain.Contracts;
 using ExaminationSystem.Infrastructure.Persistence.Data;
+using ExaminationSystem.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 

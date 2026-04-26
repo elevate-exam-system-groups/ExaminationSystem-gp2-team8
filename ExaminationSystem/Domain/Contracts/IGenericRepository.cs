@@ -1,10 +1,13 @@
-﻿namespace ExaminationSystem.Domain.Contracts
+﻿using System.Linq.Expressions;
+
+namespace ExaminationSystem.Domain.Contracts
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
-        Task<IEnumerable<TEntity>> GetAllAsync(bool asNoTracking=false);
+        IQueryable<TEntity> GetAll(bool asNoTracking=false);
         Task<TEntity?> GetByIdAsync(int id);
         Task AddAsync(TEntity entity);
+        Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
         void Update(TEntity entity);
         void  Delete(TEntity entity);
     }

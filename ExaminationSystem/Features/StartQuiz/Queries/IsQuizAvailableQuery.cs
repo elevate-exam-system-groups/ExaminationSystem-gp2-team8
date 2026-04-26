@@ -1,13 +1,14 @@
-﻿using ExaminationSystem.Domain.Contracts;
+﻿using ExaminationSystem.Domain.Common;
+using ExaminationSystem.Domain.Contracts;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
 using MediatR;
 
 namespace ExaminationSystem.Features.StartQuiz.Queries
 {
-    public record IsQuizAvailableQuery(int QuizId) : IRequest<bool>;
+    public record IsQuizAvailableQuery(int QuizId) : IRequest<Result<bool>>;
 
-    public class IsQuizAvailableQueryHandler : IRequestHandler<IsQuizAvailableQuery, bool>
+    public class IsQuizAvailableQueryHandler : IRequestHandler<IsQuizAvailableQuery, Result<bool>>
     {
         private readonly IGenericRepository<Quiz> _quizRepository;
 
@@ -16,13 +17,10 @@ namespace ExaminationSystem.Features.StartQuiz.Queries
             _quizRepository = quizRepository;
         }
 
-        public async Task<bool> Handle(IsQuizAvailableQuery request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(IsQuizAvailableQuery request, CancellationToken cancellationToken)
         {
-            var quiz = await _quizRepository.GetByIdAsync(request.QuizId);
-
-            return quiz != null
-                   && !quiz.IsDeleted
-                   && quiz.Status == Status.Published;
+            var exists = await _quizRepository.ExistsAsync(q => q.Id == request.QuizId && !q.IsDeleted && q.Status == Status.Published);
+            return Result<bool>.Success(exists);
         }
     }
 }
