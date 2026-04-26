@@ -22,14 +22,11 @@ namespace ExaminationSystem.API.Controllers
         public async Task<IActionResult> RegisterUser([FromBody] UserForRegisterationDto user)
         {
             var result = await _mediator.Send(new RegisterUserCommand(user));
-            return StatusCode(StatusCodes.Status201Created, ApiResponse<RegisterResponseDto>.Created(result, "Account created."));
+            return StatusCode(StatusCodes.Status201Created, ApiResponse<RegisterResponseDto>.Created(result.Value!, "Account created."));
         }
 
         [HttpPost("login")]
-        [ProducesResponseType(typeof(ApiResponse<LoginResponseDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<LoginResponseDto>), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ApiResponse<LoginResponseDto>), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ApiResponse<LoginResponseDto>), StatusCodes.Status429TooManyRequests)]
+        
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto, CancellationToken cancellationToken)
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -46,7 +43,7 @@ namespace ExaminationSystem.API.Controllers
                 });
             }
 
-            return Ok(ApiResponse<LoginResponseDto>.Ok(result.Data!, "Login successful."));
+            return Ok(ApiResponse<LoginResponseDto>.Ok(result.Value!, "Login successful."));
         }
     }
 }

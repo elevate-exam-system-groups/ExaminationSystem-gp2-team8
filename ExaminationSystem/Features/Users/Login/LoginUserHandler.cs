@@ -1,5 +1,5 @@
 ﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
-
+using ExaminationSystem.Domain.Common;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
 using ExaminationSystem.Features.Users.DTOs;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ExaminationSystem.Features.Users.Login
 {
-    public class LoginUserHandler : IRequestHandler<LoginUserCommand, ApiResponse<LoginResponseDto>>
+    public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginResponseDto>>
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
@@ -29,7 +29,7 @@ namespace ExaminationSystem.Features.Users.Login
             _jwtService = jwtService;
             _refreshTokenService = refreshTokenService;
         }
-        public async Task<ApiResponse<LoginResponseDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result<LoginResponseDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
             var dto = request.Dto;
 
@@ -40,7 +40,7 @@ namespace ExaminationSystem.Features.Users.Login
             if (user is null)
             {
                 
-                return ApiResponse<LoginResponseDto>.Fail("Invalid credentials.", statusCode: 401);
+                return Result<LoginResponseDto>.Failure("Invalid credentials.", statusCode: 401);
             }
 
             //Account locked 
@@ -48,19 +48,19 @@ namespace ExaminationSystem.Features.Users.Login
             {
                 _logger.LogWarning("Locked account login attempt: {Email} from {Ip}", dto.Email, request.IpAddress);
                 
-                return ApiResponse<LoginResponseDto>.Fail("Account is temporarily locked due to too many failed attempts. Try again in 15 minutes.", statusCode: 429);
+                return Result<LoginResponseDto>.Failure("Account is temporarily locked due to too many failed attempts. Try again in 15 minutes.", statusCode: 429);
             }
             //Account not verified (status = Pending)
             if (user.Status == UserStatus.Pending)
             {
                 
-                return ApiResponse<LoginResponseDto>.Fail("Account not verified. Please check your email for the OTP verification code.", statusCode: 403);
+                return Result<LoginResponseDto>.Failure("Account not verified. Please check your email for the OTP verification code.", statusCode: 403);
             }
 
             //Soft-deleted account
             if (user.DeletedAt is not null)
             {
-                return ApiResponse<LoginResponseDto>.Fail("Invalid credentials.", statusCode: 401);
+                return Result<LoginResponseDto>.Failure("Invalid credentials.", statusCode: 401);
             }
 
             //Validate password (SignInManager respects lockout settings)
@@ -71,11 +71,11 @@ namespace ExaminationSystem.Features.Users.Login
                 if (signInResult.IsLockedOut)
                 {
                     _logger.LogWarning("Account locked after failed attempts: {UserId}", user.Id);
-                    return ApiResponse<LoginResponseDto>.Fail("Too many failed attempts. Account locked for 15 minutes.", statusCode: 429);
+                    return Result<LoginResponseDto>.Failure("Too many failed attempts. Account locked for 15 minutes.", statusCode: 429);
                 }
                 var remaining = _userManager.Options.Lockout.MaxFailedAccessAttempts - await _userManager.GetAccessFailedCountAsync(user);
 
-                return ApiResponse<LoginResponseDto>.Fail($"Invalid credentials. {remaining} attempt(s) remaining before lockout.", statusCode: 401);
+                return Result<LoginResponseDto>.Failure($"Invalid credentials. {remaining} attempt(s) remaining before lockout.", statusCode: 401);
             }
 
             //Reset failed login counter on success
@@ -109,9 +109,11 @@ namespace ExaminationSystem.Features.Users.Login
                     Role = roles.FirstOrDefault() ?? "Student",
                 }
             };
-
+            if (response is null)
+                return Result<LoginResponseDto>.Failure("No data found.", 404);
+            return Result<LoginResponseDto>.Success(response) with { RefreshToken = rawRefreshToken };
             // Attach raw refresh token in a transient property so the controller can cookie it
-            return ApiResponse<LoginResponseDto>.Ok(response, "Login successful.") with { RefreshToken = rawRefreshToken };
+            // ApiResponse<LoginResponseDto>.Ok(response, "Login successful.") with { RefreshToken = rawRefreshToken };
         }
     }
 }
