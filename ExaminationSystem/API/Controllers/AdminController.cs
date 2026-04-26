@@ -2,9 +2,9 @@ using ExaminationSystem.BuildingBlocks.ExceptionHandling;
 using ExaminationSystem.BuildingBlocks.Helpers;
 using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Features.AdminStats;
-using ExaminationSystem.Features.AdminStats.DTOs;
+using ExaminationSystem.Features.Analytics.DTO;
+using ExaminationSystem.Features.Analytics.Orchestrators;
 using ExaminationSystem.Features.Attempts.DTOs;
-using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
 using ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId;
 using ExaminationSystem.Features.Attempts.Orchestrators;
 using ExaminationSystem.Features.Attempts.studemtAttemptsForAdmin;
@@ -16,6 +16,8 @@ using ExaminationSystem.Features.Quizzes.CreateQuiz.CreateQuestions;
 using ExaminationSystem.Features.Quizzes.DeleteQuiz;
 using ExaminationSystem.Features.Quizzes.DeleteQuiz.DeleteQuestion;
 using ExaminationSystem.Features.Quizzes.DTOS;
+using ExaminationSystem.Features.Quizzes.PublishQuiz;
+using ExaminationSystem.Features.Quizzes.UnpublishQuiz;
 using ExaminationSystem.Features.Quizzes.UpdateQuiz;
 using ExaminationSystem.Features.Quizzes.UpdateQuiz.UpdateQuestions;
 using MediatR;
@@ -27,6 +29,7 @@ namespace ExaminationSystem.API.Controllers
     //[Authorize(Roles = "Admin")]
     [Route("api/admin")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -84,6 +87,22 @@ namespace ExaminationSystem.API.Controllers
                 result => Ok(result));
         }
 
+        [HttpPatch("quizzes/{quizId:int}/publish")]
+        public async Task<IActionResult> PublishQuiz(int quizId)
+        {
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new PublishQuizCommand(quizId)),
+                result => Ok(result));
+        }
+
+        [HttpPatch("quizzes/{quizId:int}/unpublish")]
+        public async Task<IActionResult> UnpublishQuiz(int quizId)
+        {
+            return await ControllerHelper.ExecuteAsync(
+                () => _mediator.Send(new UnpublishQuizCommand(quizId)),
+                result => Ok(result));
+        }
+
         [HttpPost("quizzes/{quizId:int}/questions")]
         public async Task<IActionResult> CreateQuestion(int quizId, [FromBody] CreateQuestionsforQuizDto dto)
         {
@@ -124,7 +143,7 @@ namespace ExaminationSystem.API.Controllers
         }
 
         [HttpGet("attempts/{quizId:int}/{studentId:int}")]
-        public async Task<ActionResult<PaginatedResult<FilteredAttemptsDTO>>> GetAttemptsByQuizIdandStudentIdForAdmin(int quizId,int studentId, [FromQuery] PaginationParams pagination)
+        public async Task<ActionResult<PaginatedResult<FilteredAttemptsDTO>>> GetAttemptsByQuizIdandStudentIdForAdmin(int quizId, int studentId, [FromQuery] PaginationParams pagination)
         {
             var result = await _mediator.Send(new GetStudentByQuizIdandStudntIdQuery(pagination, quizId, studentId));
             return Ok(result);
@@ -141,5 +160,14 @@ namespace ExaminationSystem.API.Controllers
 
             return Ok(ApiResponse<AdminStatsDto>.Ok(result.Value!, "Stats retrieved successfully."));
         }
+        [HttpGet("analytics")]
+        public async Task<IActionResult> GetAnalyticsWithNoFilters([FromQuery]FiltersElement filters)
+        {
+            // Implement your analytics logic here, e.g., gather data from the database, perform calculations, etc.
+            var analyticsData = await _mediator.Send(new AnalyticswithNoFiltersOrchestrator(filters));
+
+            return Ok(analyticsData);
+        }
+       
     }
 }

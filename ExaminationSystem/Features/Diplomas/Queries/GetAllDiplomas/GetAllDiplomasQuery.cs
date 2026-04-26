@@ -7,7 +7,7 @@ using ExaminationSystem.Features.Enrollments;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ExaminationSystem.Features.Diplomas.Queries
+namespace ExaminationSystem.Features.Diplomas.Queries.GetAllDiplomas
 {
     public record GetAllDiplomasQuery(int Page , int PerPage ) : IRequest<PaginatedResult<DiplomaDTO>>;
 

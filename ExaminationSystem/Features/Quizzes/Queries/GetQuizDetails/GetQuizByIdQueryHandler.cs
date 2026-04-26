@@ -3,7 +3,7 @@ using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Features.Quizzes.DTOS;
 using MediatR;
 
-namespace ExaminationSystem.Features.Quizzes.GetQuizDetails
+namespace ExaminationSystem.Features.Quizzes.Queries.GetQuizDetails
 {
     public class GetQuizByIdQueryHandler : IRequestHandler<GetQuizByIdQuery, QuizDetailsDTO?>
     {

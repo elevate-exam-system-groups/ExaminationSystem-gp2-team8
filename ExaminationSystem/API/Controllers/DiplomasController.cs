@@ -1,6 +1,7 @@
 ﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
 using ExaminationSystem.Features.Diplomas.DTOS;
 using ExaminationSystem.Features.Diplomas.Queries;
+using ExaminationSystem.Features.Diplomas.Queries.GetAllDiplomas;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
