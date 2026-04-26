@@ -1,6 +1,8 @@
+using ExaminationSystem.BuildingBlocks.ExceptionHandling;
 using ExaminationSystem.BuildingBlocks.Helpers;
 using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Features.AdminStats;
+using ExaminationSystem.Features.AdminStats.DTOs;
 using ExaminationSystem.Features.Attempts.DTOs;
 using ExaminationSystem.Features.Attempts.GetAttemptDetailsForAdmin;
 using ExaminationSystem.Features.Attempts.GetStudentByQuizIdandStudntId;
@@ -132,7 +134,12 @@ namespace ExaminationSystem.API.Controllers
         public async Task<IActionResult> GetStats(CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetAdminStatsQuery(), cancellationToken);
-            return Ok(result);
+
+            if (result.IsFailure)
+                return StatusCode(result.StatusCode,
+                    ApiResponse<AdminStatsDto>.Fail(result.Error));
+
+            return Ok(ApiResponse<AdminStatsDto>.Ok(result.Value!, "Stats retrieved successfully."));
         }
     }
 }

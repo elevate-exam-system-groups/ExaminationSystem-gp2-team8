@@ -1,15 +1,17 @@
 ﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
 using ExaminationSystem.BuildingBlocks.Interfaces;
+using ExaminationSystem.Domain.Common;
 using ExaminationSystem.Domain.Entities;
 using ExaminationSystem.Domain.Enums;
 using ExaminationSystem.Features.AdminStats.DTOs;
 using ExaminationSystem.Infrastructure.Persistence;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 namespace ExaminationSystem.Features.AdminStats
 {
-    public class GetAdminStatsHandler : IRequestHandler<GetAdminStatsQuery, ApiResponse<AdminStatsDto>>
+    public class GetAdminStatsHandler : IRequestHandler<GetAdminStatsQuery, Result<AdminStatsDto>>
     {
         private readonly IGeneralRepository<User> _userrepository;
         private readonly IGeneralRepository<Diploma> _diplomarepository;
@@ -28,8 +30,7 @@ namespace ExaminationSystem.Features.AdminStats
             IGeneralRepository<Diploma> diplomarepository,
             IGeneralRepository<Quiz> quizrepository,
             IMemoryCache cache,
-            ILogger<GetAdminStatsHandler> logger,
-            ExamAppDbContext db)
+            ILogger<GetAdminStatsHandler> logger)
         {
             _userrepository = userrepository;
             _attemptsrepository = attemptsrepository;
@@ -37,15 +38,15 @@ namespace ExaminationSystem.Features.AdminStats
             _quizrepository = quizrepository;
             _cache = cache;
             _logger = logger;
-            //_db = db;
+           
         }
-        public async Task<ApiResponse<AdminStatsDto>> Handle(GetAdminStatsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<AdminStatsDto>> Handle(GetAdminStatsQuery request, CancellationToken cancellationToken)
         {
             // Try cache first
             if (_cache.TryGetValue(CacheKey, out AdminStatsDto? cached) && cached is not null)
             {
                 _logger.LogDebug("Admin stats served from cache.");
-                return ApiResponse<AdminStatsDto>.Ok(cached, "Stats retrieved successfully.");
+                return Result<AdminStatsDto>.Success(cached);
             }
             // All aggregations run as DB-side queries (no in-memory counting)
 
@@ -96,6 +97,8 @@ namespace ExaminationSystem.Features.AdminStats
                 GeneratedAt = DateTime.UtcNow,
             };
 
+            if (stats is null)
+                return Result<AdminStatsDto>.Failure("No data found.", 404);
             // Store in cache 
             _cache.Set(CacheKey, stats, new MemoryCacheEntryOptions
             {
@@ -106,7 +109,7 @@ namespace ExaminationSystem.Features.AdminStats
 
             _logger.LogInformation("Admin stats computed and cached. Users={U}, Active={A}, PassRate={P}%",totalUsers, activeUsersToday, avgPassRate);
 
-            return ApiResponse<AdminStatsDto>.Ok(stats, "Stats retrieved successfully.");
+            return Result<AdminStatsDto>.Success(stats);
         }
     }
 }
