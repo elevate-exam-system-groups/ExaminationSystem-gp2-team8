@@ -3,6 +3,7 @@ using ExaminationSystem.Features.Users.DTOs;
 using ExaminationSystem.Features.Users.Login;
 using ExaminationSystem.Features.Users.RegisterUser;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ namespace ExaminationSystem.API.Controllers
             _mediator = mediator;
         }
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> RegisterUser([FromBody] UserForRegisterationDto user)
         {
 
@@ -36,6 +38,7 @@ namespace ExaminationSystem.API.Controllers
             return StatusCode(StatusCodes.Status201Created, result);
         }
         [HttpPost("login")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(ApiResponse<LoginResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<LoginResponseDto>), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ApiResponse<LoginResponseDto>), StatusCodes.Status403Forbidden)]

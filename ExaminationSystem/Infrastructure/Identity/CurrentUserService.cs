@@ -1,4 +1,6 @@
 ﻿using ExaminationSystem.BuildingBlocks.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace ExaminationSystem.Infrastructure.Identity
 {
@@ -11,10 +13,16 @@ namespace ExaminationSystem.Infrastructure.Identity
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public int UserId => GetUserId();
 
+        private int GetUserId()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            var userIdClaim = user?.FindFirst("id")?.Value
+                ?? user?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? user?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-        public int UserId => _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == "id")?.Value != null
-            ? int.Parse(_httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "id")!.Value)
-            : 0;
+            return int.TryParse(userIdClaim, out var userId) ? userId : 0;
+        }
     }
 }
