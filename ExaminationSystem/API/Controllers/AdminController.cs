@@ -2,6 +2,7 @@ using ExaminationSystem.BuildingBlocks.ExceptionHandling;
 using ExaminationSystem.BuildingBlocks.Helpers;
 using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Features.AdminStats;
+using ExaminationSystem.Features.AdminStats.DTOs;
 using ExaminationSystem.Features.Analytics.DTO;
 using ExaminationSystem.Features.Analytics.Orchestrators;
 using ExaminationSystem.Features.Attempts.DTOs;
