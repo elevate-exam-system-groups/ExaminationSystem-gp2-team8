@@ -1,12 +1,6 @@
-﻿using ExaminationSystem.Features.Diplomas.Queries;
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
-using ExaminationSystem.BuildingBlocks.Pagination;
-using ExaminationSystem.Features.Diplomas.DTOS;
-using ExaminationSystem.Features.Diplomas.Queries;
+﻿using ExaminationSystem.BuildingBlocks.Pagination;
 using ExaminationSystem.Features.Diplomas.Queries.GetAllDiplomas;
-
 using ExaminationSystem.Features.Diplomas.Queries.GetPublishedDiplomaById;
-
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
