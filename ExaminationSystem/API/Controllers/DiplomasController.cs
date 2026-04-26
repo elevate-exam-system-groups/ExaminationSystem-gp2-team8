@@ -1,15 +1,14 @@
-﻿using ExaminationSystem.BuildingBlocks.ExceptionHandling;
-using ExaminationSystem.Features.Diplomas.DTOS;
-using ExaminationSystem.Features.Diplomas.Queries;
+﻿using ExaminationSystem.Features.Diplomas.Queries;
 using ExaminationSystem.Features.Diplomas.Queries.GetAllDiplomas;
 using MediatR;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExaminationSystem.API.Controllers
 {
-    [Route("api/student/diplomas")]
+    [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Student")]
     public class DiplomasController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -17,7 +16,6 @@ namespace ExaminationSystem.API.Controllers
         public DiplomasController(IMediator mediator)
         {
             _mediator = mediator;
-
         }
 
         [HttpGet]
@@ -43,8 +41,6 @@ namespace ExaminationSystem.API.Controllers
             }
             return Ok(result);
         }
-
         
-
     }
 }

@@ -4,13 +4,13 @@ using ExaminationSystem.BuildingBlocks.Exceptions;
 using ExaminationSystem.Features.Students.ViewDashboard;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExaminationSystem.API.Controllers
 {
     [Route("api/student/dashboard")]
     [ApiController]
+    [Authorize(Roles = "Student")]
     public class StudentDashboardController : ControllerBase
     {
         private readonly IMediator _mediator;

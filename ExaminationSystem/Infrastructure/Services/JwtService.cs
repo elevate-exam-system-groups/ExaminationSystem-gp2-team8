@@ -23,6 +23,7 @@ namespace ExaminationSystem.Infrastructure.Services
             // ── Build claims (user_id, role, exp are required per the user story) ──
             var claims = new List<Claim>
             {
+                new("id", user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Sub,user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Email,user.Email!),
                 new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),

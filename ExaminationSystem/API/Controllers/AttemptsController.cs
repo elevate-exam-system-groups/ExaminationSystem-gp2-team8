@@ -2,16 +2,12 @@
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Features.AnswerQuestion;
 using ExaminationSystem.Features.AnswerQuestion.DTOs;
-﻿using ExaminationSystem.BuildingBlocks.Helpers;
-//using ExaminationSystem.BuildingBlocks.Interfaces;
-using ExaminationSystem.Features.Attempts;
+using ExaminationSystem.BuildingBlocks.Helpers;
 using ExaminationSystem.Features.Attempts.GetAttemptDetails;
 using ExaminationSystem.Features.Attempts.GetAttempts;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using ExaminationSystem.Features.Attempts.GetAttemptResult;
 
 namespace ExaminationSystem.API.Controllers
@@ -30,13 +26,16 @@ namespace ExaminationSystem.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetQuizHistory(
             [FromQuery] int? quizId, 
             [FromQuery] int? diplomaId, 
             [FromQuery] int page= 1, 
             [FromQuery] int perPage= 20)
         {
-            int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
+            if (!TryGetAuthenticatedUserId(out var studentId))
+                return Unauthorized(ApiResponse<object>.FailureResponse("Invalid token.", "401"));
+
             return await ControllerHelper.ExecuteAsync(
                 async () =>
                 {
@@ -47,9 +46,12 @@ namespace ExaminationSystem.API.Controllers
         }
 
         [HttpGet("{attemptId:int}")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetAttemptDetails(int attemptId)
         {
-            int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
+            if (!TryGetAuthenticatedUserId(out var studentId))
+                return Unauthorized(ApiResponse<object>.FailureResponse("Invalid token.", "401"));
+
             return await ControllerHelper.ExecuteAsync(
                 () => _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId)),
                 Ok);
@@ -57,28 +59,24 @@ namespace ExaminationSystem.API.Controllers
 
 
         [HttpGet("{attemptid}/results")]
+        [Authorize(Roles = "Student,Admin")]
         public async Task<IActionResult> ViewAttemptsResult(int attemptid)
         {
-            int studentId = _currentUserService.UserId;
-            var result = await _mediator.Send(new ViewAttemptResults(studentId, attemptid));
+            if (!TryGetAuthenticatedUserId(out var userId))
+                return Unauthorized(ApiResponse<object>.FailureResponse("Invalid token.", "401"));
+
+            var result = await _mediator.Send(new ViewAttemptResults(userId, attemptid));
             return Ok(result);
         }
 
         [HttpPost("{attemptId:int}/answer")]
-        //[Authorize(Roles = "Student")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> SubmitAnswer([FromRoute] int attemptId,
             [FromBody] SubmitAnswerRequestDto dto,
             CancellationToken cancellationToken)
         {
-          
-            //Extract user ID from JWT claims 
-            //var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
-            //               ?? User.FindFirstValue("sub");
-
-            //if (!int.TryParse(userIdClaim, out var currentUserId))
-            //    return Unauthorized(ApiResponse<SubmitAnswerResponseDto>.Fail("Invalid token.", statusCode: 401));
-
-            int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
+            if (!TryGetAuthenticatedUserId(out var studentId))
+                return Unauthorized(ApiResponse<SubmitAnswerResponseDto>.Fail("Invalid token.", statusCode: 401));
 
             var result = await _mediator.Send(
                 new SubmitAnswerCommand(attemptId, studentId, dto),
@@ -94,6 +92,12 @@ namespace ExaminationSystem.API.Controllers
                 422 => UnprocessableEntity(result),
                 _ => BadRequest(result),
             };
+        }
+
+        private bool TryGetAuthenticatedUserId(out int userId)
+        {
+            userId = _currentUserService.UserId;
+            return userId > 0;
         }
     }
 }
