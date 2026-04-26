@@ -2,17 +2,12 @@
 using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Features.AnswerQuestion;
 using ExaminationSystem.Features.AnswerQuestion.DTOs;
-﻿using ExaminationSystem.BuildingBlocks.Helpers;
-//using ExaminationSystem.BuildingBlocks.Interfaces;
 using ExaminationSystem.Features.Attempts;
 using ExaminationSystem.Features.Attempts.GetAttemptDetails;
 using ExaminationSystem.Features.Attempts.GetAttempts;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using ExaminationSystem.Features.Attempts.GetAttemptResult;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ExaminationSystem.API.Controllers
 {
@@ -31,69 +26,41 @@ namespace ExaminationSystem.API.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetQuizHistory(
-            [FromQuery] int? quizId, 
-            [FromQuery] int? diplomaId, 
-            [FromQuery] int page= 1, 
-            [FromQuery] int perPage= 20)
+            [FromQuery] int? quizId,
+            [FromQuery] int? diplomaId,
+            [FromQuery] int page = 1,
+            [FromQuery] int perPage = 20)
         {
-            int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
-            return await ControllerHelper.ExecuteAsync(
-                async () =>
-                {
-                    var query = new GetStudentAttemptQuery(studentId, quizId, diplomaId, page, perPage);
-                    return await _mediator.Send(query);
-                },
-                history => history.Data.Count == 0 ? NotFound() : Ok(history));
+            int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 3;
+            var result = await _mediator.Send(new GetStudentAttemptQuery(studentId, quizId, diplomaId, page, perPage));
+            return Ok(ApiResponse<object>.Ok(result));
         }
 
         [HttpGet("{attemptId:int}")]
         public async Task<IActionResult> GetAttemptDetails(int attemptId)
         {
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
-            return await ControllerHelper.ExecuteAsync(
-                () => _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId)),
-                Ok);
+            var result = await _mediator.Send(new GetStudentAttemptDetailsQuery(studentId, attemptId));
+            return Ok(ApiResponse<object>.Ok(result));
         }
 
-
-        [HttpGet("{attemptid}/results")]
-        public async Task<IActionResult> ViewAttemptsResult(int attemptid)
+        [HttpGet("{attemptId:int}/results")]
+        public async Task<IActionResult> ViewAttemptsResult(int attemptId)
         {
             int studentId = 3;
-            var result = await _mediator.Send(new ViewAttemptResults(studentId, attemptid));
-            return Ok(result);
+            var result = await _mediator.Send(new ViewAttemptResults(studentId, attemptId));
+            return Ok(ApiResponse<object>.Ok(result));
         }
 
         [HttpPost("{attemptId:int}/answer")]
-        //[Authorize(Roles = "Student")]
-        public async Task<IActionResult> SubmitAnswer([FromRoute] int attemptId,
+        public async Task<IActionResult> SubmitAnswer(
+            [FromRoute] int attemptId,
             [FromBody] SubmitAnswerRequestDto dto,
             CancellationToken cancellationToken)
         {
-          
-            //Extract user ID from JWT claims 
-            //var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
-            //               ?? User.FindFirstValue("sub");
-
-            //if (!int.TryParse(userIdClaim, out var currentUserId))
-            //    return Unauthorized(ApiResponse<SubmitAnswerResponseDto>.Fail("Invalid token.", statusCode: 401));
-
             int studentId = _currentUserService.UserId != 0 ? _currentUserService.UserId : 1;
-
-            var result = await _mediator.Send(
-                new SubmitAnswerCommand(attemptId, studentId, dto),
-                cancellationToken);
-
-            return result.StatusCode switch
-            {
-                200 => Ok(result),
-                403 => StatusCode(StatusCodes.Status403Forbidden, result),
-                404 => NotFound(result),
-                409 => Conflict(result),
-                410 => StatusCode(StatusCodes.Status410Gone, result),
-                422 => UnprocessableEntity(result),
-                _ => BadRequest(result),
-            };
+            var result = await _mediator.Send(new SubmitAnswerCommand(attemptId, studentId, dto), cancellationToken);
+            return Ok(ApiResponse<object>.Ok(result));
         }
     }
 }

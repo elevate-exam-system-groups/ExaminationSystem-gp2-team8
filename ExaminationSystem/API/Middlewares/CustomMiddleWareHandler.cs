@@ -42,7 +42,7 @@ namespace ExaminationSystem.API.Middlewares
 
 
                 //3-response object
-                var ResponseObject = ApiResponse<object>.FailureResponse(
+                var ResponseObject = ApiResponse<object>.Fail(
                     message: ex.Message,
                     code: code
                 );
