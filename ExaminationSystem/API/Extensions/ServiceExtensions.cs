@@ -10,10 +10,13 @@ namespace ExaminationSystem.API.Extensions
     public static class ServiceExtensions
     {
         public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
+
+
         {
             services.AddIdentity<User, IdentityRole<int>>(o =>
             {
                 o.Password.RequireLowercase = false;
+
                 o.Password.RequireUppercase = false;
                 o.Password.RequireNonAlphanumeric = false;
                 o.Password.RequiredLength = 8;
