@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Features.Attempts.GetAttemptResult
 {
-    public class ViewAttemptResultsHandler : IRequestHandler<ViewAttemptResults, ApiResponse<ViewResultDTO>>
+    public class ViewAttemptResultsHandler : IRequestHandler<ViewAttemptResults, ViewResultDTO>
     {
 
         IGeneralRepository<Domain.Entities.Attempts> _repository;
@@ -16,53 +16,54 @@ namespace ExaminationSystem.Features.Attempts.GetAttemptResult
         {
             _repository = repository;
         }
-        public async Task<ApiResponse<ViewResultDTO>> Handle(ViewAttemptResults request, CancellationToken cancellationToken)
+        public async Task<ViewResultDTO> Handle(ViewAttemptResults request, CancellationToken cancellationToken)
         {
-            var exist = await _repository.GetByIdAsync(request.id);
-
-
-            if (exist == null) throw new NotFoundException("this attempts is not Founded");
-
             var attempt = await _repository.Query()
-                        .Include(a => a.StudentAnswers)
-                            .ThenInclude(s => s.SelectedOption)
-                        .Include(a => a.Quiz)
-                            .ThenInclude(q => q.Questions)
-                            .ThenInclude(o => o.Options)
-                         .Where(a => a.Id == request.id && (a.Attempt == AttemptStatus.TimeOut || a.Attempt == AttemptStatus.Submit)
-                        && a.UserId == request.studentId)
-                         .FirstOrDefaultAsync(cancellationToken);
+                .Where(a => a.Id == request.id
+                         && (a.Attempt == AttemptStatus.TimeOut || a.Attempt == AttemptStatus.Submit)
+                         && a.UserId == request.studentId)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.score,
+                    QuizPassScore = a.Quiz.PassScore,
+                    QuestionsCount = a.Quiz.Questions.Count,
+                    StudentAnswers = a.StudentAnswers.Select(sa => new
+                    {
+                        sa.QuestionId,
+                        sa.SelectedOption.OptionText,
+                        sa.SelectedOption.IsCorrect,
+                        CorrectAnswer = sa.Question.Options
+                            .Where(o => o.IsCorrect)
+                            .Select(o => o.OptionText)
+                            .FirstOrDefault()
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (attempt is null) throw new ForbiddenException(" results not available until submitted ");
+            if (attempt is null)
+                throw new ForbiddenException("results not available until submitted");
 
+            var status = attempt.QuizPassScore <= attempt.score ? "Passed" : "Failed";
 
-            var Status = attempt.Quiz.PassScore <= attempt.score ? "Passed" : "Failed";
+            var correctCount = attempt.StudentAnswers.Count(a => a.IsCorrect);
 
-            var questionsCount = attempt.Quiz.Questions.Count;
-
-            var correctCount = attempt.StudentAnswers.Count(a => a.SelectedOption.IsCorrect == true);
-
-
-
-
-            var attemptDto = new ViewResultDTO()
+            var dto = new ViewResultDTO
             {
                 score = attempt.score,
-                status = Status,
-                TotalQuestions = questionsCount,
+                status = status,
+                TotalQuestions = attempt.QuestionsCount,
                 CorrectCount = correctCount,
-                // i wanna get list of questions for this attempt
-                Questions = attempt.StudentAnswers.Select(s => new QuestionAttemptsDTO()
+                Questions = attempt.StudentAnswers.Select(s => new QuestionAttemptsDTO
                 {
                     QuestionId = s.QuestionId,
-                    SelectedAnswer = s.SelectedOption.OptionText,
-                    CorrectAnswer = s.Question.Options.FirstOrDefault(o => o.IsCorrect == true)?.OptionText ?? "",
-                    IsCorrect = s.SelectedOption.IsCorrect
-
+                    SelectedAnswer = s.OptionText,
+                    CorrectAnswer = s.CorrectAnswer ?? "",
+                    IsCorrect = s.IsCorrect
                 }).ToList()
             };
 
-            return ApiResponse<ViewResultDTO>.SuccessResponse(attemptDto);
+            return dto;
         }
 
     }

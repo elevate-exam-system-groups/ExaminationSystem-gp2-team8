@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ExaminationSystem.Features.Users.RegisterUser
 {
-    public record RegisterUserCommand(UserForRegisterationDto userDto) : IRequest<ApiResponse<RegisterResponseDto>>;
+    public record RegisterUserCommand(UserForRegisterationDto userDto) : IRequest<RegisterResponseDto>;
+
     
 }
